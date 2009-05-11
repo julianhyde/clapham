@@ -1,0 +1,319 @@
+
+ExtendedTableRef 	::= 	UnusedExtension
+TableOverOpt 	::= 	
+SqlSelectKeywords 	::= 	E
+SqlInsertKeywords 	::= 	E
+NonReservedKeyWord 	::= 	( CommonNonReservedKeyWord | DdlNonReservedKeyWord )
+ExtensionModelDefinition 	::= 	UnusedExtension
+ExtensionModelSchemaObjDefinition 	::= 	UnusedExtension
+ExtensionModelDrop 	::= 	UnusedExtension
+ExtensionModelAlter 	::= 	UnusedExtension
+ExtendedBuiltinFunctionCall 	::= 	UnusedExtension
+FloorCeilOptions 	::= 	StandardFloorCeilOptions
+getEndPos 	::= 	java code
+CompoundIdentifier2 	::= 	Identifier ( <DOT> Identifier )?
+CompoundIdentifier3 	::= 	Identifier ( <DOT> Identifier ( <DOT> Identifier )? )?
+QuotedString 	::= 	<QUOTED_STRING>
+FarragoSqlStmtEof 	::= 	( DdlStmtEof | ( SqlStmtEof | PsmBody ) ) <EOF>
+DdlStmtEof 	::= 	( ( <CREATE> ( ( <OR> <REPLACE> ) ( ( <RENAME> <TO> SimpleIdentifier ) )? )? ( SchemaDefinition | DataWrapperDefinition | SchemaObjectDefinition | IndexDefinition | DataServerDefinition | UserDefinition | RoleDefinition | ExtensionModelDefinition | LabelDefinition ) ) | ( <DROP> ( ( SchemaDrop | TableDrop | IndexDrop | ViewDrop | RoutineDrop | UserDefinedTypeDrop | UserDefinedOrderingDrop | JarDrop | DataServerDrop | DataWrapperDrop | ForeignTableDrop | UserDrop | RoleDrop | ExtensionModelDrop ) | LabelDrop ) ) | ( <TRUNCATE> ( <TABLE> TableIdentifier ) ) | ( <SET> ( <CATALOG> Expression | <SCHEMA> Expression | <PATH> Expression ) ) | <ALTER> ( <SYSTEM> ( <SET> SystemParamAssignment | <ADD> CatalogExtension | <REPLACE> CatalogReplace | <DEALLOCATE> DeallocateOld ) | <SESSION> ( <IMPLEMENTATION> SessionImplementation | <SET> SessionParamAssignment ) | <TABLE> | ) | <GRANT> ( GrantRoleStmt | GrantPrivStmt ) | <CHECKPOINT> | <COMMIT> | <ROLLBACK> Rollback | <SAVEPOINT> Savepoint | <RELEASE> <SAVEPOINT> ReleaseSavepoint | <IMPORT> ImportForeignSchemaStmt | <ANALYZE> AnalyzeStmt ) <EOF>
+SchemaDefinition 	::= 	<SCHEMA> CompoundIdentifier2 ( <AUTHORIZATION> SimpleIdentifier )? ( SchemaPath )? OptionalDescription ( <CREATE> SchemaObjectDefinition )*
+SchemaObjectDefinition 	::= 	( TableDefinition | ViewDefinition | ForeignTableDefinition | FunctionDefinition | ProcedureDefinition | ConstructorDefinition | JarDefinition | UserDefinedTypeDefinition | UserDefinedOrderingDefinition | ExtensionModelSchemaObjDefinition )
+SchemaPath 	::= 	SearchPath
+SearchPath 	::= 	<PATH> SearchPathElement ( <COMMA> SearchPathElement )*
+SearchPathElement 	::= 	CompoundIdentifier2
+TableDefinition 	::= 	( UnscopedTableDefinition | ScopedTableDefinition ) ( DataServerReference )? OptionalStorageOptions ( <CREATE> IndexDefinition )*
+UnscopedTableDefinition 	::= 	<TABLE> CompoundIdentifier3 <LPAREN> TableElementList <RPAREN> OptionalSampleList OptionalDescription
+ScopedTableDefinition 	::= 	<GLOBAL> <TEMPORARY> UnscopedTableDefinition ( <ON> <COMMIT> ( <PRESERVE> | <DELETE> ) <ROWS> )?
+ViewDefinition 	::= 	<VIEW> CompoundIdentifier3 ( <LPAREN> SimpleIdentifierCommaList <RPAREN> )? OptionalDescription <AS> OrderedQueryOrExpr
+IndexDefinition 	::= 	( <CLUSTERED> )? <INDEX> SimpleIdentifier <ON> TableIdentifier <LPAREN> SimpleIdentifierCommaList <RPAREN>
+UserDefinition 	::= 	<USER> SimpleIdentifier <AUTHORIZATION> Expression ( <DEFAULT_KW> ( CatalogReference | SchemaReference ) )?
+RoleDefinition 	::= 	<ROLE> SimpleIdentifier ( <WITH> <ADMIN> SimpleIdentifier )?
+LabelDefinition 	::= 	<LABEL> SimpleIdentifier ( <FROM> <LABEL> SimpleIdentifier )? OptionalDescription
+TableIdentifier 	::= 	CompoundIdentifier3
+ColumnIdentifier 	::= 	SimpleIdentifier
+ColumnSetIdentifier 	::= 	CompoundIdentifier3
+ViewReference 	::= 	<VIEW> CompoundIdentifier3
+RoutineReference 	::= 	( <SPECIFIC> )? RoutineReferenceImpl
+SpecificRoutineReference 	::= 	<SPECIFIC> RoutineReferenceImpl
+RoutineReferenceImpl 	::= 	( <ROUTINE> | <FUNCTION> | <PROCEDURE> ) CompoundIdentifier3
+TableElementList 	::= 	TableElement ( <COMMA> TableElement )*
+TableElement 	::= 	( ColumnDefinition | TableConstraint )
+BasicColumnDefinition 	::= 	SimpleIdentifier TypedElement
+TypedElement 	::= 	DataType
+ColumnDefinition 	::= 	BasicColumnDefinition ( DefaultClause | SequenceOptions )? ( ColumnConstraint )* ( CollateClause )? OptionalStorageOptions
+DefaultClause 	::= 	<DEFAULT_KW> ( Literal )
+SequenceOptions 	::= 	<GENERATED> ( <ALWAYS> | <BY> <DEFAULT_KW> ) <AS> <IDENTITY> ( <LPAREN> ( CommonSequenceOption )* <RPAREN> )?
+CommonSequenceOption 	::= 	<START> <WITH> NumericLiteral
+	| 	BasicSequenceOption
+BasicSequenceOption 	::= 	<INCREMENT> <BY> NumericLiteral
+	| 	<MINVALUE> NumericLiteral
+	| 	<NO> <MINVALUE>
+	| 	<MAXVALUE> NumericLiteral
+	| 	<NO> <MAXVALUE>
+	| 	<CYCLE>
+	| 	<NO> <CYCLE>
+TableConstraint 	::= 	( <CONSTRAINT> Identifier )? TableUniqueConstraint
+TableUniqueConstraint 	::= 	UniqueConstraint <LPAREN> SimpleIdentifierCommaList <RPAREN>
+UniqueConstraint 	::= 	( <UNIQUE> | <PRIMARY> <KEY> )
+ColumnConstraint 	::= 	( <CONSTRAINT> Identifier )? ( <NOT> <NULL> | UniqueConstraint )
+SchemaDrop 	::= 	SchemaReference CascadeOption
+CatalogReference 	::= 	<CATALOG> SimpleIdentifier
+SchemaReference 	::= 	<SCHEMA> CompoundIdentifier2
+TableDrop 	::= 	<TABLE> TableIdentifier CascadeOption
+ViewDrop 	::= 	ViewReference CascadeOption
+RoutineDrop 	::= 	RoutineReference CascadeOption
+UserDefinedTypeDrop 	::= 	<TYPE> CompoundIdentifier3 CascadeOption
+UserDefinedOrderingDrop 	::= 	<ORDERING> <FOR> CompoundIdentifier3 CascadeOption
+JarDrop 	::= 	<JAR> CompoundIdentifier3 <OPTIONS> <LPAREN> NumericLiteral <RPAREN> CascadeOption
+IndexDrop 	::= 	<INDEX> CompoundIdentifier3
+CascadeOption 	::= 	( ( <RESTRICT> | <CASCADE> ) )?
+SystemParamAssignment 	::= 	SimpleIdentifier <EQ> SystemParamValue
+SessionParamAssignment 	::= 	SimpleIdentifier <EQ> SystemParamValue
+CatalogExtension 	::= 	<CATALOG> <JAR> CompoundIdentifier3
+CatalogReplace 	::= 	<CATALOG>
+DeallocateOld 	::= 	<OLD>
+SessionImplementation 	::= 	<SET> ( <JAR> CompoundIdentifier3 | <DEFAULT_KW> )
+	| 	<ADD> <JAR> CompoundIdentifier3
+AlterTableStmt 	::= 	TableIdentifier ( <ADD> ( <COLUMN> )? AddColumnStmt | <ALTER> <COLUMN> AlterColumnStmt | <REBUILD> )
+AddColumnStmt 	::= 	ColumnDefinition
+AlterColumnStmt 	::= 	ColumnIdentifier AlterIdentityColumnStmt
+AlterIdentityColumnStmt 	::= 	( <RESTART> <WITH> NumericLiteral | <SET> BasicSequenceOption )+
+SystemParamValue 	::= 	( StrictLiteral | <MAX> | <MIN> )
+Rollback 	::= 	( <TO> <SAVEPOINT> SimpleIdentifier )?
+Savepoint 	::= 	SimpleIdentifier
+ReleaseSavepoint 	::= 	SimpleIdentifier
+DataWrapperDefinition 	::= 	ForeignOpt <DATA> <WRAPPER> SimpleIdentifier <LIBRARY> QuotedString <LANGUAGE> <JAVA> OptionalStorageOptions OptionalDescription
+ForeignOpt 	::= 	<LOCAL>
+	| 	<FOREIGN>
+DataWrapperReference 	::= 	ForeignOpt <DATA> <WRAPPER> SimpleIdentifier
+DataServerDefinition 	::= 	<SERVER> SimpleIdentifier ( <TYPE> QuotedString )? ( <VERSION> QuotedString )? DataWrapperReference OptionalStorageOptions OptionalDescription
+FunctionDefinition 	::= 	<FUNCTION> CompoundIdentifier3 <LPAREN> ( RoutineParamList )? <RPAREN> ReturnsClause RoutineCharacteristics ( <STATIC> <DISPATCH> )? ( SqlFunctionBody | ExternalRoutineBody )
+ConstructorDefinition 	::= 	<SPECIFIC> <METHOD> CompoundIdentifier3 <FOR> CompoundIdentifier3 RightsClause PsmBody
+PsmBody 	::= 	<BEGIN> ( ConstructorAssignment )* <RETURN> <SELF> <SEMICOLON> <END>
+ConstructorAssignment 	::= 	<SET> <SELF> <DOT> SimpleIdentifier <EQ> Expression <SEMICOLON>
+ReturnsClause 	::= 	<RETURNS> ( <TABLE> <LPAREN> TableFunctionColumnListElement ( <COMMA> TableFunctionColumnListElement )* <RPAREN> | TypedElement )
+TableFunctionColumnListElement 	::= 	BasicColumnDefinition
+	| 	SimpleIdentifier <DOT> <STAR>
+ProcedureDefinition 	::= 	<PROCEDURE> CompoundIdentifier3 <LPAREN> ( RoutineParamList )? <RPAREN> RoutineCharacteristics ( ExternalRoutineBody )
+SqlFunctionBody 	::= 	RightsClause <RETURN> Expression
+RightsClause 	::= 	( <SQL> <SECURITY> ( <INVOKER> | <DEFINER> ) )?
+ExternalRoutineBody 	::= 	<EXTERNAL> <NAME> ( Identifier | QuotedString ) ( RoutineParameterStyle )? ( <EXTERNAL> <SECURITY> ( <DEFINER> | <INVOKER> | <IMPLEMENTATION> <DEFINED> ) )?
+RoutineParameterStyle 	::= 	<PARAMETER> <STYLE> ( <SQL> | <GENERAL> | <JAVA> | <SYSTEM> <DEFINED> <JAVA> )
+RoutineCharacteristics 	::= 	( ( <LANGUAGE> ( <JAVA> | <SQL> ) ) | RoutineParameterStyle | ( <SPECIFIC> CompoundIdentifier2 ) | <DETERMINISTIC> | <DYNAMIC_FUNCTION> | <NOT> ( <DETERMINISTIC> | <DYNAMIC_FUNCTION> ) | <NO> <SQL> | <CONTAINS> <SQL> | <READS> <SQL> <DATA> | <MODIFIES> <SQL> <DATA> | <RETURNS> <NULL> <ON> <NULL> <INPUT> | <CALLED> <ON> <NULL> <INPUT> )*
+RoutineParamList 	::= 	RoutineParam ( <COMMA> RoutineParam )*
+RoutineParam 	::= 	( ( <IN> | <OUT> | <INOUT> ) )? SimpleIdentifier ( NonColumnListRoutineParam | <SELECT> <FROM> SimpleIdentifier )
+NonColumnListRoutineParam 	::= 	( TypedElement | <CURSOR> )
+JarDefinition 	::= 	<JAR> CompoundIdentifier3 <LIBRARY> QuotedString <OPTIONS> <LPAREN> NumericLiteral <RPAREN>
+UserDefinedTypeDefinition 	::= 	<TYPE> CompoundIdentifier3 <AS> ( ObjectTypeDefinition | DistinctTypeDefinition ) UserDefinedTypeOptions OptionalDescription MethodSpecificationList
+UserDefinedOrderingDefinition 	::= 	<ORDERING> <FOR> CompoundIdentifier3 ( <EQUALS> <ONLY> <BY> OrderingCategory | <ORDER> <FULL> <BY> OrderingCategory )
+OrderingCategory 	::= 	( <RELATIVE> <WITH> SpecificRoutineReference | <MAP> <WITH> SpecificRoutineReference | <STATE> ( CompoundIdentifier3 )? )
+MethodSpecificationList 	::= 	( MethodSpecification ( <COMMA> MethodSpecification )* )?
+MethodSpecification 	::= 	<CONSTRUCTOR> <METHOD> SimpleIdentifier <LPAREN> ( RoutineParamList )? <RPAREN> ReturnsClause <SELF> <AS> <RESULT> RoutineCharacteristics
+UserDefinedTypeOptions 	::= 	( <FINAL> | <INSTANTIABLE> | <NOT> ( <FINAL> | <INSTANTIABLE> ) )*
+ObjectTypeDefinition 	::= 	<LPAREN> AttributeDefinition ( <COMMA> AttributeDefinition )* <RPAREN>
+DistinctTypeDefinition 	::= 	DataType
+AttributeDefinition 	::= 	SimpleIdentifier DataType ( DefaultClause )? ( CollateClause )?
+DataServerReference 	::= 	<SERVER> SimpleIdentifier
+ForeignTableDefinition 	::= 	<FOREIGN> <TABLE> CompoundIdentifier3 ( <LPAREN> ForeignTableElementList <RPAREN> )? DataServerReference OptionalStorageOptions OptionalDescription
+ForeignTableReference 	::= 	<FOREIGN> <TABLE> CompoundIdentifier3
+ForeignTableElementList 	::= 	ColumnDefinition ( <COMMA> ColumnDefinition )*
+OptionalDescription 	::= 	( <DESCRIPTION> StringLiteral )?
+OptionalSampleList 	::= 	( <SAMPLE> <LPAREN> Sample ( <COMMA> Sample )* <RPAREN> )?
+Sample 	::= 	CompoundIdentifier ( Baseline | ) <AS> Identifier
+Baseline 	::= 	<BASELINE> <TIMESTAMP> <QUOTED_STRING>
+	| 	
+OptionalStorageOptions 	::= 	( <OPTIONS> <LPAREN> StorageOption ( <COMMA> StorageOption )* <RPAREN> )?
+StorageOption 	::= 	SimpleIdentifier QuotedString
+ImportForeignSchemaStmt 	::= 	<FOREIGN> <SCHEMA> SimpleIdentifier ( ( <LIMIT> <TO> | <EXCEPT> ) ( <LPAREN> SimpleIdentifierCommaList <RPAREN> | <TABLE_NAME> <LIKE> QuotedString ) )? <FROM> DataServerReference <INTO> CompoundIdentifier2
+DataWrapperDrop 	::= 	DataWrapperReference CascadeOption
+DataServerDrop 	::= 	DataServerReference CascadeOption
+ForeignTableDrop 	::= 	ForeignTableReference CascadeOption
+UserDrop 	::= 	<USER> SimpleIdentifier
+RoleDrop 	::= 	<ROLE> SimpleIdentifier
+LabelDrop 	::= 	<LABEL> SimpleIdentifier CascadeOption
+PrivilegedAction 	::= 	( <INSERT> | <UPDATE> | <SELECT> | <DELETE> | <EXECUTE> | <USAGE> )
+PrivilegedActionList 	::= 	PrivilegedAction ( <COMMA> PrivilegedAction )*
+GrantOptions 	::= 	( <WITH> <GRANT> <OPTION> )? ( <GRANTED> <BY> ( <CURRENT_ROLE> | <CURRENT_USER> ) )?
+GrantPrivStmt 	::= 	( <ALL> getPos <PRIVILEGES> getPos | PrivilegedActionList ) <ON> ( ( <TABLE> )? ColumnSetIdentifier | SpecificRoutineReference ) <TO> SimpleIdentifierCommaList ( <WITH> <HIERARCHY> <OPTION> )? GrantOptions
+GrantRoleStmt 	::= 	<ROLE> SimpleIdentifierCommaList <TO> SimpleIdentifierCommaList GrantOptions
+AnalyzeStmt 	::= 	<TABLE> TableIdentifier ( <COMPUTE> | <ESTIMATE> ) <STATISTICS> <FOR> ( ( <ALL> <COLUMNS> ) | ( <COLUMNS> <LPAREN> SimpleIdentifierCommaList <RPAREN> ) ) ( <SAMPLE> UnsignedNumericLiteral <PERCENT> )?
+DdlNonReservedKeyWord 	::= 	( <BASELINE> | <COLUMNS> | <COMPUTE> | <ESTIMATE> | <INDEX> | <JAR> | <PERCENT> | <REBUILD> | <RENAME> | <REPLACE> | <SAMPLE> | <STATISTICS> )
+E 	::= 	java code
+startList 	::= 	java code
+getPos 	::= 	java code
+checkQueryExpression 	::= 	java code
+checkNonQueryExpression 	::= 	java code
+parseDateLiteral 	::= 	java code
+parseTimeLiteral 	::= 	java code
+parseTimestampLiteral 	::= 	java code
+parseIntervalLiteral 	::= 	java code
+convertException 	::= 	java code
+cleanupParseException 	::= 	java code
+matchesPrefix 	::= 	java code
+OrderedQueryOrExpr 	::= 	( QueryOrExpr ) ( OrderBy )?
+LeafQuery 	::= 	SqlSelect
+	| 	TableConstructor
+	| 	ExplicitTable
+ParenthesizedExpression 	::= 	<LPAREN> OrderedQueryOrExpr <RPAREN>
+ParenthesizedQueryOrCommaList 	::= 	<LPAREN> OrderedQueryOrExpr ( <COMMA> Expression )* <RPAREN>
+FunctionParameterList 	::= 	<LPAREN> ( <DISTINCT> | <ALL> )? OrderedQueryOrExpr ( <COMMA> Expression )* <RPAREN>
+SqlQueryEof 	::= 	OrderedQueryOrExpr ( <EOF> )
+SqlStmtEof 	::= 	( OrderedQueryOrExpr | SqlExplain | SqlInsert | SqlDelete | SqlUpdate | SqlMerge | SqlProcedureCall ) ( <EOF> )
+SqlSelect 	::= 	<SELECT> SqlSelectKeywords ( <DISTINCT> | <ALL> | E ) SelectList <FROM> FromClause WhereOpt GroupByOpt HavingOpt WindowOpt
+SqlExplain 	::= 	<EXPLAIN> <PLAN> ( ExplainDetailLevel )? ExplainDepth ( <AS> <XML> | ) <FOR> ( OrderedQueryOrExpr | SqlInsert | SqlDelete | SqlUpdate | SqlMerge )
+ExplainDepth 	::= 	( <WITH> <TYPE> | <WITH> <IMPLEMENTATION> | <WITHOUT> <IMPLEMENTATION> | )
+ExplainDetailLevel 	::= 	( <EXCLUDING> <ATTRIBUTES> | <INCLUDING> ( <ALL> )? <ATTRIBUTES> )
+SqlProcedureCall 	::= 	<CALL> NamedRoutineCall
+NamedRoutineCall 	::= 	CompoundIdentifier ( <LPAREN> <RPAREN> | ParenthesizedQueryOrCommaList )
+SqlInsert 	::= 	<INSERT> SqlInsertKeywords <INTO> CompoundIdentifier ( <LPAREN> SimpleIdentifierCommaList <RPAREN> )? OrderedQueryOrExpr
+SqlDelete 	::= 	<DELETE> <FROM> CompoundIdentifier ( ( <AS> )? SimpleIdentifier )? WhereOpt
+SqlUpdate 	::= 	<UPDATE> CompoundIdentifier ( ( <AS> )? SimpleIdentifier )? <SET> SimpleIdentifier <EQ> Expression ( <COMMA> SimpleIdentifier <EQ> Expression )* WhereOpt
+SqlMerge 	::= 	<MERGE> <INTO> CompoundIdentifier ( ( <AS> )? SimpleIdentifier )? <USING> TableRef <ON> Expression ( WhenMatchedClause ( WhenNotMatchedClause )? | WhenNotMatchedClause )
+WhenMatchedClause 	::= 	<WHEN> <MATCHED> <THEN> <UPDATE> <SET> SimpleIdentifier <EQ> Expression ( <COMMA> SimpleIdentifier <EQ> Expression )*
+WhenNotMatchedClause 	::= 	<WHEN> <NOT> <MATCHED> <THEN> <INSERT> SqlInsertKeywords ( <LPAREN> SimpleIdentifierCommaList <RPAREN> )? ( <LPAREN> )? <VALUES> RowConstructor ( <RPAREN> )?
+SelectList 	::= 	SelectItem ( <COMMA> SelectItem )*
+SelectItem 	::= 	SelectExpression ( ( <AS> )? SimpleIdentifier )?
+SelectExpression 	::= 	Identifier <DOT> <STAR>
+	| 	<STAR>
+	| 	Expression
+FromClause 	::= 	TableRef ( ( <NATURAL> | ) ( <JOIN> | <INNER> <JOIN> | <LEFT> ( <OUTER> )? <JOIN> | <RIGHT> ( <OUTER> )? <JOIN> | <FULL> ( <OUTER> )? <JOIN> | <CROSS> <JOIN> ) TableRef ( <ON> Expression | <USING> <LPAREN> SimpleIdentifierCommaList <RPAREN> | ) | <COMMA> TableRef )*
+TableRef 	::= 	( CompoundIdentifier TableOverOpt | ( <LATERAL> )? ParenthesizedExpression TableOverOpt | <UNNEST> ParenthesizedQueryOrCommaList | <TABLE> <LPAREN> TableFunctionCall <RPAREN> | ExtendedTableRef ) ( ( <AS> )? Identifier ( <LPAREN> SimpleIdentifierCommaList <RPAREN> )? )? ( <TABLESAMPLE> ( <SUBSTITUTE> <LPAREN> StringLiteral <RPAREN> | ( <BERNOULLI> | <SYSTEM> ) <LPAREN> UnsignedNumericLiteral <RPAREN> ( <REPEATABLE> <LPAREN> IntLiteral <RPAREN> )? ) )?
+TableFunctionCall 	::= 	( <SPECIFIC> )? NamedRoutineCall
+ExplicitTable 	::= 	<TABLE> CompoundIdentifier
+TableConstructor 	::= 	<VALUES> RowConstructorList
+RowConstructorList 	::= 	RowConstructor ( <COMMA> RowConstructor )*
+RowConstructor 	::= 	( <LPAREN> <ROW> ParenthesizedQueryOrCommaList <RPAREN> | ( <ROW> )? ParenthesizedQueryOrCommaList | Expression )
+WhereOpt 	::= 	<WHERE> Expression
+	| 	
+GroupByOpt 	::= 	<GROUP> <BY> ExpressionCommaList
+	| 	<GROUP> <BY> <LPAREN> <RPAREN>
+	| 	
+ExpressionCommaList 	::= 	Expression ( <COMMA> Expression )*
+HavingOpt 	::= 	<HAVING> Expression
+	| 	
+WindowOpt 	::= 	<WINDOW> SimpleIdentifier <AS> WindowSpecification ( <COMMA> SimpleIdentifier <AS> WindowSpecification )*
+	| 	
+WindowSpecification 	::= 	<LPAREN> ( SimpleIdentifier | ) ( <PARTITION> <BY> ExpressionCommaList | ) ( OrderBy | ) ( ( <ROWS> | <RANGE> ) ( <BETWEEN> WindowRange <AND> WindowRange | WindowRange ) )? ( <ALLOW> <PARTIAL> | <DISALLOW> <PARTIAL> )? <RPAREN>
+WindowRange 	::= 	<CURRENT> <ROW>
+	| 	<UNBOUNDED> ( <PRECEDING> | <FOLLOWING> )
+	| 	StrictLiteral ( <PRECEDING> | <FOLLOWING> )
+OrderBy 	::= 	<ORDER> <BY> OrderItem ( <COMMA> OrderItem )*
+OrderItem 	::= 	Expression ( <ASC> | <DESC> | )
+SqlExpressionEof 	::= 	Expression ( <EOF> )
+QueryOrExpr 	::= 	LeafQueryOrExpr ( BinaryQueryOperator LeafQueryOrExpr )*
+LeafQueryOrExpr 	::= 	Expression
+	| 	LeafQuery
+Expression 	::= 	Expression2
+Expression2 	::= 	Expression3 ( ( ( ( <NOT> <IN> | <IN> ) ParenthesizedQueryOrCommaList | ( <NOT> <BETWEEN> ( <SYMMETRIC> | <ASYMMETRIC> )? | <BETWEEN> ( <SYMMETRIC> | <ASYMMETRIC> )? ) Expression3 | ( <NOT> ( <LIKE> | <SIMILAR> <TO> ) | <LIKE> | <SIMILAR> <TO> ) Expression2 ( <ESCAPE> Expression3 )? | BinaryRowOperator Expression3 | PostfixRowOperator ) )+ | )
+Expression3 	::= 	AtomicRowExpression
+	| 	CursorExpression
+	| 	<ROW> <LPAREN> SimpleIdentifierCommaList <RPAREN>
+	| 	PrefixRowOperator Expression3
+	| 	( <ROW> )? ParenthesizedQueryOrCommaList ( ( <OVERLAPS> ParenthesizedQueryOrCommaList ) | ( IntervalQualifier ) )?
+CollateClause 	::= 	<COLLATE> <COLLATION_ID>
+AtomicRowExpression 	::= 	Literal
+	| 	DynamicParam
+	| 	BuiltinFunctionCall
+	| 	JdbcFunctionCall
+	| 	MultisetConstructor
+	| 	NamedFunctionCall
+	| 	ContextVariable
+	| 	CompoundIdentifier
+	| 	NewSpecification
+	| 	<CASE> ( Expression )? ( <WHEN> Expression <THEN> Expression )+ ( <ELSE> Expression )? <END>
+Literal 	::= 	NumericLiteral
+	| 	StringLiteral
+	| 	SpecialLiteral
+	| 	DateTimeLiteral
+	| 	IntervalLiteral
+StrictLiteral 	::= 	NumericLiteral
+	| 	StringLiteral
+	| 	SpecialLiteral
+	| 	DateTimeLiteral
+	| 	IntervalLiteral
+UnsignedNumericLiteral 	::= 	<UNSIGNED_INTEGER_LITERAL>
+	| 	<DECIMAL_NUMERIC_LITERAL>
+	| 	<APPROX_NUMERIC_LITERAL>
+NumericLiteral 	::= 	<PLUS> UnsignedNumericLiteral
+	| 	<MINUS> UnsignedNumericLiteral
+	| 	UnsignedNumericLiteral
+SpecialLiteral 	::= 	<TRUE>
+	| 	<FALSE>
+	| 	<UNKNOWN>
+	| 	<NULL>
+StringLiteral 	::= 	<BINARY_STRING_LITERAL> ( <QUOTED_STRING> )*
+	| 	( <PREFIXED_STRING_LITERAL> | <QUOTED_STRING> | <UNICODE_STRING_LITERAL> ) ( <QUOTED_STRING> )* ( <UESCAPE> <QUOTED_STRING> )?
+DateTimeLiteral 	::= 	<LBRACE_D> <QUOTED_STRING> <RBRACE>
+	| 	<LBRACE_T> <QUOTED_STRING> <RBRACE>
+	| 	<LBRACE_TS> <QUOTED_STRING> <RBRACE>
+	| 	<DATE> <QUOTED_STRING>
+	| 	<TIME> <QUOTED_STRING>
+	| 	<TIMESTAMP> <QUOTED_STRING>
+MultisetConstructor 	::= 	<MULTISET> <LPAREN> LeafQueryOrExpr <RPAREN>
+	| 	<MULTISET> <LBRACKET> Expression ( <COMMA> Expression )* <RBRACKET>
+IntervalLiteral 	::= 	<INTERVAL> ( <MINUS> | <PLUS> )? <QUOTED_STRING> IntervalQualifier
+IntervalQualifier 	::= 	( <YEAR> ( <LPAREN> UnsignedIntLiteral <RPAREN> )? ( <TO> <MONTH> )? | <MONTH> ( <LPAREN> UnsignedIntLiteral <RPAREN> )? | <DAY> ( <LPAREN> UnsignedIntLiteral <RPAREN> )? ( <TO> ( <HOUR> | <MINUTE> | <SECOND> ( <LPAREN> UnsignedIntLiteral <RPAREN> )? ) )? | <HOUR> ( <LPAREN> UnsignedIntLiteral <RPAREN> )? ( <TO> ( <MINUTE> | <SECOND> ( <LPAREN> UnsignedIntLiteral <RPAREN> )? ) )? | <MINUTE> ( <LPAREN> UnsignedIntLiteral <RPAREN> )? ( <TO> ( <SECOND> ( <LPAREN> UnsignedIntLiteral <RPAREN> )? ) )? | <SECOND> ( <LPAREN> UnsignedIntLiteral ( <COMMA> UnsignedIntLiteral )? <RPAREN> )? )
+TimeUnit 	::= 	<YEAR>
+	| 	<MONTH>
+	| 	<DAY>
+	| 	<HOUR>
+	| 	<MINUTE>
+	| 	<SECOND>
+DynamicParam 	::= 	<HOOK>
+Identifier 	::= 	( <IDENTIFIER> | <QUOTED_IDENTIFIER> | <UNICODE_QUOTED_IDENTIFIER> ( <UESCAPE> <QUOTED_STRING> )? | NonReservedKeyWord )
+SimpleIdentifier 	::= 	Identifier
+SimpleIdentifierCommaList 	::= 	SimpleIdentifier ( <COMMA> SimpleIdentifier )*
+CompoundIdentifier 	::= 	Identifier ( <DOT> Identifier )*
+NewSpecification 	::= 	<NEW> NamedRoutineCall
+UnsignedIntLiteral 	::= 	<UNSIGNED_INTEGER_LITERAL>
+IntLiteral 	::= 	( <UNSIGNED_INTEGER_LITERAL> | <PLUS> <UNSIGNED_INTEGER_LITERAL> )
+	| 	<MINUS> <UNSIGNED_INTEGER_LITERAL>
+DataType 	::= 	( TypeName ( <LPAREN> UnsignedIntLiteral ( <COMMA> UnsignedIntLiteral )? <RPAREN> )? ( <CHARACTER> <SET> Identifier )? ( CollectionsTypeName )? )
+TypeName 	::= 	( ( <CHARACTER> | <CHAR> ) ( <VARYING> )? | <VARCHAR> | <DATE> | <TIME> | <TIMESTAMP> | ( <DECIMAL> | <DEC> | <NUMERIC> ) | <BOOLEAN> | <INTEGER> | <INT> | ( <BINARY> ) ( <VARYING> )? | <VARBINARY> | <TINYINT> | <SMALLINT> | <BIGINT> | <REAL> | <DOUBLE> ( <PRECISION> )? | <FLOAT> | CollectionsTypeName | CompoundIdentifier )
+CollectionsTypeName 	::= 	<MULTISET>
+CursorExpression 	::= 	<CURSOR> Expression
+BuiltinFunctionCall 	::= 	( <CAST> <LPAREN> Expression <AS> ( DataType | <INTERVAL> IntervalQualifier ) <RPAREN> )
+	| 	( <EXTRACT> <LPAREN> TimeUnit <FROM> Expression <RPAREN> )
+	| 	( <POSITION> <LPAREN> AtomicRowExpression <IN> Expression <RPAREN> )
+	| 	( <CONVERT> <LPAREN> Expression <USING> Identifier <RPAREN> )
+	| 	( <TRANSLATE> <LPAREN> Expression <USING> Identifier <RPAREN> )
+	| 	( <OVERLAY> <LPAREN> Expression <PLACING> Expression <FROM> Expression ( <FOR> Expression )? <RPAREN> )
+	| 	( <FLOOR> FloorCeilOptions )
+	| 	( ( <CEIL> | <CEILING> ) FloorCeilOptions )
+	| 	( <SUBSTRING> <LPAREN> Expression ( <FROM> | <COMMA> ) Expression ( ( <FOR> | <COMMA> ) Expression )? <RPAREN> )
+	| 	( <TRIM> <LPAREN> ( ( <BOTH> | <TRAILING> | <LEADING> )? ( Expression )? ( <FROM> | <RPAREN> ) )? Expression <RPAREN> )
+	| 	ExtendedBuiltinFunctionCall
+NamedFunctionCall 	::= 	( <SPECIFIC> )? ( FunctionName ( <LPAREN> <STAR> <RPAREN> | <LPAREN> <RPAREN> | FunctionParameterList ) ( <OVER> ( SimpleIdentifier | WindowSpecification ) )? )
+StandardFloorCeilOptions 	::= 	ParenthesizedQueryOrCommaList ( <OVER> ( SimpleIdentifier | WindowSpecification ) )?
+NonReservedJdbcFunctionName 	::= 	( <SUBSTRING> )
+FunctionName 	::= 	( CompoundIdentifier | ReservedFunctionName )
+ReservedFunctionName 	::= 	( <ABS> | <AVG> | <CARDINALITY> | <CHAR_LENGTH> | <CHARACTER_LENGTH> | <COALESCE> | <COLLECT> | <CUME_DIST> | <COUNT> | <CURRENT_DATE> | <CURRENT_TIME> | <CURRENT_TIMESTAMP> | <DENSE_RANK> | <ELEMENT> | <EXP> | <FIRST_VALUE> | <FUSION> | <LAST_VALUE> | <LN> | <LOCALTIME> | <LOCALTIMESTAMP> | <LOWER> | <MAX> | <MIN> | <MOD> | <NULLIF> | <OCTET_LENGTH> | <PERCENT_RANK> | <POWER> | <RANK> | <ROW_NUMBER> | <SQRT> | <SUM> | <UPPER> )
+ContextVariable 	::= 	( <CURRENT_CATALOG> | <CURRENT_DATE> | <CURRENT_DEFAULT_TRANSFORM_GROUP> | <CURRENT_PATH> | <CURRENT_ROLE> | <CURRENT_SCHEMA> | <CURRENT_TIME> | <CURRENT_TIMESTAMP> | <CURRENT_USER> | <LOCALTIME> | <LOCALTIMESTAMP> | <SESSION_USER> | <SYSTEM_USER> | <USER> )
+JdbcFunctionCall 	::= 	( <LBRACE_FN> ( <INSERT> | ReservedFunctionName | NonReservedJdbcFunctionName | Identifier ) ( <LPAREN> <STAR> <RPAREN> | <LPAREN> <RPAREN> | ParenthesizedQueryOrCommaList ) <RBRACE> )
+BinaryQueryOperator 	::= 	( <UNION> ( <ALL> | <DISTINCT> )? | <INTERSECT> ( <ALL> | <DISTINCT> )? | <EXCEPT> ( <ALL> | <DISTINCT> )? )
+BinaryMultisetOperator 	::= 	( <MULTISET> ( <UNION> ( <ALL> | <DISTINCT> )? | <INTERSECT> ( <ALL> | <DISTINCT> )? | <EXCEPT> ( <ALL> | <DISTINCT> )? ) )
+BinaryRowOperator 	::= 	<EQ>
+	| 	<GT>
+	| 	<LT>
+	| 	<LE>
+	| 	<GE>
+	| 	<NE>
+	| 	<PLUS>
+	| 	<MINUS>
+	| 	<STAR>
+	| 	<SLASH>
+	| 	<CONCAT>
+	| 	<AND>
+	| 	<OR>
+	| 	<IS> <DISTINCT> <FROM>
+	| 	<IS> <NOT> <DISTINCT> <FROM>
+	| 	<MEMBER> <OF>
+	| 	<SUBMULTISET> <OF>
+	| 	BinaryMultisetOperator
+PrefixRowOperator 	::= 	<PLUS>
+	| 	<MINUS>
+	| 	<NOT>
+	| 	<EXISTS>
+PostfixRowOperator 	::= 	<IS> ( <A> <SET> | <NOT> ( <NULL> | <TRUE> | <FALSE> | <UNKNOWN> ) | ( <NULL> | <TRUE> | <FALSE> | <UNKNOWN> ) )
+CommonNonReservedKeyWord 	::= 	( <A> | <ABSOLUTE> | <ACTION> | <ADA> | <ADD> | <ADMIN> | <AFTER> | <ALWAYS> | <ASC> | <ASSERTION> | <ASSIGNMENT> | <ATTRIBUTE> | <ATTRIBUTES> | <BEFORE> | <BERNOULLI> | <BREADTH> | <C> | <CASCADE> | <CATALOG> | <CATALOG_NAME> | <CHAIN> | <CHARACTER_SET_CATALOG> | <CHARACTER_SET_NAME> | <CHARACTER_SET_SCHEMA> | <CHARACTERISTICS> | <CHARACTERS> | <CLASS_ORIGIN> | <COBOL> | <COLLATION> | <COLLATION_CATALOG> | <COLLATION_NAME> | <COLLATION_SCHEMA> | <COLUMN_NAME> | <COMMAND_FUNCTION> | <COMMAND_FUNCTION_CODE> | <COMMITTED> | <CONDITION_NUMBER> | <CONNECTION> | <CONNECTION_NAME> | <CONSTRAINT_CATALOG> | <CONSTRAINT_NAME> | <CONSTRAINT_SCHEMA> | <CONSTRAINTS> | <CONSTRUCTOR> | <CONTAINS> | <CONTINUE> | <CURSOR_NAME> | <DATA> | <DATETIME_INTERVAL_CODE> | <DATETIME_INTERVAL_PRECISION> | <DEFAULTS> | <DEFERRABLE> | <DEFERRED> | <DEFINED> | <DEFINER> | <DEGREE> | <DEPTH> | <DERIVED> | <DESC> | <DESCRIPTION> | <DESCRIPTOR> | <DIAGNOSTICS> | <DISPATCH> | <DOMAIN> | <DYNAMIC_FUNCTION> | <DYNAMIC_FUNCTION_CODE> | <EQUALS> | <EXCEPTION> | <EXCLUDE> | <EXCLUDING> | <FINAL> | <FIRST> | <FOLLOWING> | <FORTRAN> | <FOUND> | <G> | <GENERAL> | <GENERATED> | <GO> | <GOTO> | <GRANTED> | <HIERARCHY> | <IMMEDIATE> | <IMPLEMENTATION> | <INCLUDING> | <INCREMENT> | <INITIALLY> | <INPUT> | <INSTANCE> | <INSTANTIABLE> | <INVOKER> | <ISOLATION> | <JAVA> | <K> | <KEY> | <KEY_MEMBER> | <KEY_TYPE> | <LABEL> | <LAST> | <LENGTH> | <LEVEL> | <LIBRARY> | <LOCATOR> | <M> | <MAP> | <MATCHED> | <MAXVALUE> | <MESSAGE_LENGTH> | <MESSAGE_OCTET_LENGTH> | <MESSAGE_TEXT> | <MINVALUE> | <MORE_KW> | <MUMPS> | <NAME> | <NAMES> | <NESTING> | <NEXT> | <NORMALIZED> | <NULLABLE> | <NULLS> | <NUMBER> | <OBJECT> | <OCTETS> | <OPTION> | <OPTIONS> | <ORDERING> | <ORDINALITY> | <OTHERS> | <OUTPUT> | <OVERRIDING> | <PAD> | <PARAMETER_MODE> | <PARAMETER_NAME> | <PARAMETER_ORDINAL_POSITION> | <PARAMETER_SPECIFIC_CATALOG> | <PARAMETER_SPECIFIC_NAME> | <PARAMETER_SPECIFIC_SCHEMA> | <PARTIAL> | <PASCAL> | <PATH> | <PLACING> | <PLAN> | <PLI> | <PRECEDING> | <PRESERVE> | <PRIOR> | <PRIVILEGES> | <PUBLIC> | <READ> | <RELATIVE> | <REPEATABLE> | <RESTART> | <RESTRICT> | <RETURNED_CARDINALITY> | <RETURNED_LENGTH> | <RETURNED_OCTET_LENGTH> | <RETURNED_SQLSTATE> | <ROLE> | <ROUTINE> | <ROUTINE_CATALOG> | <ROUTINE_NAME> | <ROUTINE_SCHEMA> | <ROW_COUNT> | <SCALE> | <SCHEMA> | <SCHEMA_NAME> | <SCOPE_CATALOGS> | <SCOPE_NAME> | <SCOPE_SCHEMA> | <SECTION> | <SECURITY> | <SELF> | <SEQUENCE> | <SERIALIZABLE> | <SERVER> | <SERVER_NAME> | <SESSION> | <SETS> | <SIMPLE> | <SIZE> | <SOURCE> | <SPACE> | <SPECIFIC_NAME> | <STATE> | <STATEMENT> | <STRUCTURE> | <STYLE> | <SUBCLASS_ORIGIN> | <SUBSTITUTE> | <TABLE_NAME> | <TEMPORARY> | <TIES> | <TOP_LEVEL_COUNT> | <TRANSACTION> | <TRANSACTIONS_ACTIVE> | <TRANSACTIONS_COMMITTED> | <TRANSACTIONS_ROLLED_BACK> | <TRANSFORM> | <TRANSFORMS> | <TRIGGER_CATALOG> | <TRIGGER_NAME> | <TRIGGER_SCHEMA> | <TYPE> | <UNBOUNDED> | <UNCOMMITTED> | <UNDER> | <UNNAMED> | <USAGE> | <USER_DEFINED_TYPE_CATALOG> | <USER_DEFINED_TYPE_CODE> | <USER_DEFINED_TYPE_NAME> | <USER_DEFINED_TYPE_SCHEMA> | <VERSION> | <VIEW> | <WRAPPER> | <WORK> | <WRITE> | <XML> | <ZONE> )
+UnusedExtension 	::= 	( <ZONE> )

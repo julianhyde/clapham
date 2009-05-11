@@ -1,0 +1,173 @@
+<h1><font face="H1">Clapham</font></h1>
+<p>Clapham is an open-source railroad diagram generator.</p>
+<p>Railroad diagrams are a graphical way of representing the grammar of a 
+computer language. When a computer language is large, even people who use the 
+language day-to-day have trouble remembering its nuances. A railroad diagram 
+represents the grammar visually, and is easier to understand by non- or 
+semi-technical users.</p>
+<p>For example, the following charts explain the syntax of a column definition 
+in the dialect of SQL 
+implemented by the LucidDB database engine:</p>
+<table border='2' id="table3" cellpadding="10" style="border-collapse: collapse" bgcolor="#C0C0C0">
+<tr><td><a href='farrago/ColumnDefinition.svg'><img src='farrago/ColumnDefinition.png'/><p>
+	<a href='farrago/DefaultClause.svg'><img src='farrago/DefaultClause.png'/></p>
+	<p><a href='farrago/SequenceOptions.svg'>
+	<img src='farrago/SequenceOptions.png'/></p>
+	<p><a href='farrago/ColumnConstraint.svg'>
+	<img src='farrago/ColumnConstraint.png'/></p>
+	<p><a href='farrago/CommonSequenceOption.svg'>
+	<img src='farrago/CommonSequenceOption.png'/></p>
+	<p><a href='farrago/BasicSequenceOption.svg'>
+	<img src='farrago/BasicSequenceOption.png'/></td></tr>
+</table>
+<p>Railroad charts are time-consuming to create and maintain by hand, so it 
+makes sense to automate creation</p>
+<h2>How Clapham works</h2>
+<p>Clapham is a batch program. It has an input file, a few options, and 
+generates output files.</p>
+<h3>Input</h3>
+<p>The main input to Clapham is a definition of the grammar. Clapham supports 
+two meta-grammars (languages for specifying grammars):</p>
+<ul>
+	<li>Wirth Syntax Notation (WSN)</li>
+	<li>Extended Backus-Naur Form (BNF)</li>
+</ul>
+<h3>Output</h3>
+<p>Clapham can output:</p>
+<ul>
+	<li>Railroad diagrams in PNG format</li>
+	<li>Railroad diagrams in SVG format</li>
+	<li>An HTML page, index.html, containing a table of all symbols</li>
+</ul>
+<h3>Options</h3>
+<p>There aren't many options right now. It does what it does. See the 
+roadmap for some preferences we'd like to add.</p>
+<h3>Command line</h3>
+<p>Clapham is a Java program that you invoke from the command line. For example, 
+if you invoke it like this:</p>
+<blockquote>
+	<p><code>java net.hydromatic.clapham.Clapham -d grammar grammar.bnf</code></p>
+</blockquote>
+<p>it will read <code>grammar.bnf</code> and generate a <code><i>symbol</i>.png</code> 
+and <code><i>symbol</i>.svg</code> for each symbol in the grammar file. It will 
+generate those files, and an HTML index file <code>index.html</code>, to the
+<code>grammar</code> directory.</p>
+<p>The <code>--help</code> option prints the command line options:</p>
+<blockquote>
+	<p><code>Clapham - Railroad diagram generator<br>
+	Usage:<br>
+&nbsp; clapham [ options ] filename<br>
+	<br>
+	Options:<br>
+&nbsp; --help&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Print this help<br>
+&nbsp; -d directory Specify output directory<br>
+&nbsp; filename&nbsp;&nbsp;&nbsp;&nbsp; Name of file containing grammar</code></p>
+</blockquote>
+<h2>Examples</h2>
+<h3>Example #1: Wirth Syntax Notation (WSN)</h3>
+<p>Clapham generated railroad diagrams for the Wirth Syntax Notation. This is 
+one of the two grammar notations accepted by Clapham, so Clapham is essentially 
+documenting itself.</p>
+<p>The grammar <code>wirth.bnf</code> is as follows:</p>
+<blockquote>
+	<p><code>SYNTAX&nbsp;&nbsp;&nbsp;&nbsp; ::= ( PRODUCTION )*<br>
+	PRODUCTION ::= IDENTIFIER &lt;EQUALS&gt; EXPRESSION &quot;.&quot;<br>
+	EXPRESSION ::= TERM ( &lt;BAR&gt; TERM )*<br>
+	TERM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ::= FACTOR+<br>
+	FACTOR&nbsp;&nbsp;&nbsp;&nbsp; ::= IDENTIFIER<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 
+	LITERAL<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &lt;LBRACKET&gt; 
+	EXPRESSION &lt;RBRACKET&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &lt;LPAREN&gt; 
+	EXPRESSION &lt;RPAREN&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &lt;LBRACE&gt; 
+	EXPRESSION &lt;RBRACE&gt;<br>
+	IDENTIFIER ::= &lt;LETTER&gt;<br>
+	LITERAL&nbsp;&nbsp;&nbsp; ::= &lt;QUOT&gt; &lt;CHARACTER&gt;+ &lt;QUOT&gt;</code></p>
+</blockquote>
+<p>Use Clapham's command line tool to generate the diagrams:</p>
+<blockquote>
+	<p><code>CP=<br>
+	for i in lib/*.jar; do CP=$CP:$i; done<br>
+	java -cp $CP net.hydromatic.clapham.Clapham testsrc/net/hydromatic/clapham/example/wirth.bnf</code></p>
+</blockquote>
+<p>The following diagrams are generated:</p>
+<table border='2' id="table1" cellpadding="10" style="border-collapse: collapse" bgcolor="#C0C0C0">
+<tr><td><a href='wirth/EXPRESSION.svg'><img src='wirth/EXPRESSION.png'/></td></tr>
+<tr><td><a href='wirth/FACTOR.svg'><img src='wirth/FACTOR.png'/></td></tr>
+<tr><td><a href='wirth/IDENTIFIER.svg'><img src='wirth/IDENTIFIER.png'/></td></tr>
+<tr><td><a href='wirth/LITERAL.svg'><img src='wirth/LITERAL.png'/></td></tr>
+<tr><td><a href='wirth/PRODUCTION.svg'><img src='wirth/PRODUCTION.png'/></td></tr>
+<tr><td><a href='wirth/SYNTAX.svg'><img src='wirth/SYNTAX.png'/></td></tr>
+<tr><td><a href='wirth/TERM.svg'><img src='wirth/TERM.png'/></td></tr>
+</table>
+<p>Each syntax chart is a PNG file, but you can click through to an image in SVG 
+format.</p>
+<h3>Example #2. LucidDB SQL grammar</h3>
+<p>LucidDB is an open-source database released by the Eigenbase Foundation. Its 
+SQL grammar is specified in JavaCC. Clapham does not read JavaCC grammar files 
+yet, but JavaCC has a utility jjdoc that generates a web page in BNF, and 
+Clapham can read that.</p>
+<p>Here are some of the charts generated.&nbsp; The full set is
+<a href="farrago/index.html">here</a>.</p>
+<table border='2' id="table2" cellpadding="10" style="border-collapse: collapse" bgcolor="#C0C0C0">
+	<tr>
+		<td><a href='farrago/SqlSelect.svg'><img src='farrago/SqlSelect.png'/></td>
+	</tr>
+	<tr>
+		<td><a href='farrago/SelectList.svg'><img src='farrago/SelectList.png'/></td>
+	</tr>
+	<tr>
+		<td><a href='farrago/FromClause.svg'><img src='farrago/FromClause.png'/></td>
+	</tr>
+	<tr>
+		<td><a href='farrago/WhereOpt.svg'><img src='farrago/WhereOpt.png'/></td>
+	</tr>
+	<tr>
+		<td><a href='farrago/GroupByOpt.svg'><img src='farrago/GroupByOpt.png'/></td>
+	</tr>
+	<tr>
+		<td><a href='farrago/HavingOpt.svg'><img src='farrago/HavingOpt.png'/></td>
+	</tr>
+</table>
+<h2>Roadmap</h2>
+<p>Clapham is alpha. It does most of the things that it should, but not 
+particularly well, and there are bugs. In short, it needs work. (Contributions 
+welcome!)</p>
+<p>Here are some of the things we'd like to make it do:</p>
+<ul>
+	<li>Read JavaCC as an input format.</li>
+	<li>Generate a text file for each chart, containing the rules on that chart 
+	in BNF or other meta-grammar. This could be displayed alongside the chart to 
+	aid searchability.</li>
+	<li>Generate <a href="http://en.wikipedia.org/wiki/Image_map">HTML &lt;map&gt; and 
+	&lt;area&gt; elements</a> for each chart. This allows symbols in a chart to act as 
+	hyperlinks, and other effects such as text boxes on mouseover.</li>
+	<li>Combine multiple charts into one.</li>
+	<li>Chart definition file. As the number options available for each chart 
+	increases, it will not be possible to specify them all on the command line. 
+	We cannot add extra content to the grammar file, so we need to store the 
+	extra information in an auxiliary file. (The current workaround to this 
+	problem is to store the information in code. See how <code>
+	net.hydromatic.clapham.example.WirthExample</code> loads a grammar, sets 
+	some preferences, then generates each chart individually.)</li>
+	<li>Specify that certain symbols should be inlined. Grammar authors 
+	sometimes create symbols to make the grammar maintainable, or to resolve 
+	conflicts in the grammar, but these symbols are meaningless to the end-user. 
+	For example, the Farrago SQL grammar would be more readable if <code>GroupOpt</code> and 
+	<code>HavingOpt</code> were expanded inline in the <code>SqlSelect</code> chart.</li>
+	<li>Allow symbols to have spaces and other punctuation in their name. (This 
+	may already be possible, but I haven't tested it.)</li>
+	<li>Fine-tune the layout of the charts. The title of the chart should be 
+	optional. Text isn't always properly aligned, or isn't always the right size 
+	for the box. And so forth.</li>
+	<li>Wrap large charts over multiple lines.</li>
+	<li>Preferences for chart layout. Whether to wrap a particular chart, and if 
+	so, where to wrap. Which chart optimizations to perform, specified globally, 
+	but can be overridden for a particular chart.</li>
+</ul>
+<hr>
+<p><font size="2">Clapham Railroad Diagram Generator<br>
+Copyright (C) 2009-2009 Julian Hyde<br>
+$Id: $</font></p>

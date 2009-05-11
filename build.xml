@@ -1,0 +1,307 @@
+<!--
+  == $Id: $
+  == Clapham generates railroad diagrams to represent computer language grammars.
+  == Copyright (C) 2009-2009 Julian Hyde
+  ==
+  == This program is free software; you can redistribute it and/or modify it
+  == under the terms of the GNU General Public License as published by the Free
+  == Software Foundation; either version 2 of the License, or (at your option)
+  == any later version approved by The Eigenbase Project.
+  ==
+  == This program is distributed in the hope that it will be useful,
+  == but WITHOUT ANY WARRANTY; without even the implied warranty of
+  == MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  == GNU General Public License for more details.
+  ==
+  == You should have received a copy of the GNU General Public License
+  == along with this program; if not, write to the Free Software
+  == Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+<project name="clapham" default="compile" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <property environment="env"/>
+    <property file="build.properties"/>
+
+    <property name="Name" value="${project.Name}"/>
+    <property name="name" value="${project.name}"/>
+    <property name="version" value="${project.revision}"/>
+    <property name="vendor" value="${project.vendor}"/>
+
+    <!-- Define desired ivy version and location. -->
+    <property name="ivy.install.version" value="2.0.0-rc2"/>
+    <property name="ivy.jar.dir" value="${basedir}/ivy"/>
+    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar"/>
+
+    <property name="project.location" location="${basedir}"/>
+    <property name="src.dir" location="${basedir}/src"/>
+    <property name="testsrc.dir" location="${basedir}/testsrc"/>
+    <property name="classes.dir" location="${basedir}/classes"/>
+    <property name="testclasses.dir" location="${basedir}/testclasses"/>
+    <property name="javadoc.dir" value="doc/api"/>
+    <property name="javadoc.location" value="${project.location}/doc/api"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="lib.location" location="${project.location}/lib"/>
+    <property name="testlib.dir" value="testlib"/>
+    <property name="doc.dir" location="${basedir}/doc"/>
+    <property name="dist.dir" location="${basedir}/dist"/>
+    <property name="dist.src.file" location="${dist.dir}/${project.name}-${project.revision}-src.zip"/>
+    <property name="project.build.debug" value="on"/>
+
+    <path id="project.classpath">
+        <pathelement location="${lib.dir}/javacc.jar"/>
+        <pathelement location="${lib.dir}/batik-svggen.jar"/>
+        <pathelement location="${lib.dir}/batik-awt-util.jar"/>
+        <pathelement location="${lib.dir}/batik-transcoder.jar"/>
+        <pathelement location="${lib.dir}/batik-util.jar"/>
+        <pathelement location="${ant.home}/lib/ant.jar"/>
+        <pathelement location="${ant.home}/lib/optional.jar"/>
+    </path>
+
+    <path id="project.build.classpath">
+        <pathelement location="${classes.dir}"/>
+        <path refid="project.classpath"/>
+    </path>
+
+    <path id="javadoc.classpath">
+        <path refid="project.build.classpath"/>
+    </path>
+
+    <!-- Bootstrap Ivy from web site so that it can be used without any special
+         installation. Then of course it will load all of the other jars we
+         need. -->
+    <target name="download-ivy" unless="skip.download">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <get
+                src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+                dest="${ivy.jar.file}"
+                usetimestamp="true"/>
+    </target>
+
+    <!-- Define ivy tasks. If you put ivy.jar in your ant lib directory, this
+         task is not necessary. -->
+    <target name="install-ivy" depends="download-ivy">
+        <!-- Try to load ivy here from local ivy dir, in case the user has not
+             already dropped it into ant's lib dir. (Note that the latter copy
+             will always take precedence.) We will not fail as long as local
+             lib dir exists (it may be empty) and ivy is in at least one of
+             ant's lib dir or the local lib dir. -->
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+        </path>
+        <taskdef
+                resource="org/apache/ivy/ant/antlib.xml"
+                uri="antlib:org.apache.ivy.ant"
+                classpathref="ivy.lib.path"/>
+        <ivy:settings file="${basedir}/ivysettings.xml"/>
+    </target>
+
+    <target name="clean-ivy">
+        <delete dir="${ivy.jar.dir}"/>
+    </target>
+
+    <target name="clean-cache" depends="install-ivy">
+        <ivy:cleancache/>
+    </target>
+
+    <target name="wirth-parser">
+        <javacc
+                target="src/net/hydromatic/clapham/parser/wirth/WirthParser.jj"
+                javacchome="${basedir}/lib"/>
+    </target>
+
+    <target name="bnf-parser">
+        <javacc
+                target="src/net/hydromatic/clapham/parser/bnf/BnfParser.jj"
+                javacchome="${basedir}/lib"/>
+    </target>
+
+    <target name="prepare" depends="download-ivy,install-ivy,resolve">
+        <mkdir dir="${classes.dir}"/>
+    </target>
+
+    <target name="resolve" unless="skip.download">
+        <ivy:resolve file="ivy.xml"/>
+        <ivy:retrieve pattern="${lib.dir}/[module].[ext]"/>
+    </target>
+
+    <target name="all" depends="prepare,wirth-parser,bnf-parser,compile"/>
+
+    <target name="compile" depends="
+  version,
+  prepare,
+  wirth-parser,
+  bnf-parser,
+  compile.java"/>
+
+    <target name="version">
+        <echo file="VERSION.txt">Title: ${name}
+Version: ${version}
+Vendor: ${vendor}
+</echo>
+    </target>
+
+    <target name="compile.java">
+        <javac
+                srcdir="${src.dir}"
+                destdir="${classes.dir}"
+                debug="${project.build.debug}"
+                classpathref="project.build.classpath"
+                source="1.6">
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile,version"
+            description="Jars up the bin directory after a compile">
+        <jar destfile="${lib.dir}/${project.name}.jar">
+            <zipfileset dir="${classes.dir}" prefix="" includes="**/*"/>
+            <zipfileset dir="${basedir}" prefix=""
+                        includes="
+LICENSE.html,
+README.txt,
+VERSION.txt"/>
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <section name="net.hydromatic.clapham">
+                    <attribute name="Implementation-Title" value="${name}"/>
+                    <attribute name="Implementation-Version"
+                               value="${version}"/>
+                    <attribute name="Implementation-Vendor" value="${vendor}"/>
+                </section>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean">
+        <delete includeEmptyDirs="true" failonerror="false">
+            <fileset dir="." includes="VERSION.txt" />
+            <fileset dir="classes" includes="**/*.class" />
+            <fileset dir="src/net/hydromatic/clapham/parser/wirth" includes="**/*.java" excludes="**/package-info.java"/>
+            <fileset dir="src/net/hydromatic/clapham/parser/bnf" includes="**/*.java" excludes="**/package-info.java"/>
+        </delete>
+    </target>
+
+    <target name="srczip" depends="clean,version">
+      <mkdir dir="${dist.dir}" />
+      <delete file="${dist.src.file}"/>
+      <zip
+          zipfile="${dist.src.file}"
+          update="true">
+        <zipfileset
+            dir="."
+            prefix="${name}-${version}"
+            includes="
+src/**/*.java,
+src/**/*.jj,
+testsrc/**/*.java,
+testsrc/**/*.bnf,
+doc/**/*.html,
+build.xml,
+build.properties,
+ivy.xml,
+ivysettings.xml,
+LICENSE.html,
+README.txt,
+VERSION.txt"
+            excludes="
+${javadoc.dir}/**,
+**/_vti*/*,
+**/*~,
+doc/wirth/*,
+doc/farrago/*,
+**/junit-results/**" />
+      </zip>
+    </target>
+
+    <target name="javadoc" depends="clean-stray-package-html">
+        <mkdir dir="${javadoc.dir}" />
+        <delete quiet="true" file="${javadoc.dir}/index.html" />
+        <javadoc sourcepath="${src.dir}" classpathref="javadoc.classpath"
+            destdir="${javadoc.dir}" packagenames="net.hydromatic.clapham.*"
+            overview="${src.dir}/overview.html"
+            footer="&lt;a href=&quot;http://sourceforge.net/projects/clapham&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=243703&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
+            author="true" source="1.6" access="public"
+            Windowtitle="${project.name}, version ${project.revision}" additionalparam="-linksource">
+            <tag name="pre" description="Pre-condition:" scope="constructors,methods" />
+            <tag name="post" description="Post-condition:" scope="constructors,methods" />
+            <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
+            <link href="http://java.sun.com/javase/6/docs/api/" />
+        </javadoc>
+    </target>
+
+    <!--
+        Strict javadoc for testing purposes. Includes all packages and
+        non-public classes and methods.
+    -->
+    <target name="javadoc-strict" depends="clean-stray-package-html">
+        <mkdir dir="${javadoc.dir}" />
+        <delete quiet="true" file="${javadoc.dir}/index.html" />
+        <javadoc sourcepath="${src.dir}:${testsrc.dir}" classpathref="javadoc.classpath"
+            destdir="${javadoc.dir}" packagenames="net.hydromatic.clapham.*" overview="${src.dir}/overview.html"
+            footer="&lt;a href=&quot;http://sourceforge.net/projects/clapham&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=243703&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
+            author="true" source="1.6" access="private"
+            Windowtitle="${project.name}, version ${project.revision}">
+            <tag name="pre" description="Pre-condition:" scope="constructors,methods" />
+            <tag name="post" description="Post-condition:" scope="constructors,methods" />
+            <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
+            <link href="http://java.sun.com/javase/6/docs/api/" />
+        </javadoc>
+    </target>
+
+    <!--
+        Generate javadoc with embedded UML diagrams using the yDoc doclet from
+        yWorks.com. Set ydoc.home in build.properties, then replace
+        ${ydoc.home}/resources/ydoc.license with a full license (free for open
+        source use).
+    -->
+    <target name="javadoc-with-ydoc" depends="clean-stray-package-html">
+        <mkdir dir="${javadoc.dir}" />
+        <delete quiet="true" file="${javadoc.dir}/index.html" />
+        <property name="ps" value="${path.separator}" />
+        <javadoc sourcepath="${src.dir}" classpathref="javadoc.classpath"
+            destdir="${javadoc.dir}" packagenames="org.olap4j.*"
+            overview="${src.dir}/overview.html"
+            footer="&lt;a href=&quot;http://sourceforge.net/projects/clapham&quot;&gt;&lt;img src=&quot;http://sourceforge.net/sflogo.php?group_id=243703&#38;type=1&quot; width=&quot;88&quot; height=&quot;31&quot; border=&quot;0&quot; alt=&quot;SourceForge.net_Logo&quot;&gt;&lt;/a&gt;"
+            author="true" source="1.6" access="public"
+            Windowtitle="${project.name}, version ${project.revision}" additionalparam="-linksource">
+            <tag name="pre" description="Pre-condition:" scope="constructors,methods" />
+            <tag name="post" description="Post-condition:" scope="constructors,methods" />
+            <tag name="testcase" description="Test-case:" scope="constructors,methods,types" />
+            <link href="http://java.sun.com/javase/6/docs/api/" />
+            <link href="http://www.junit.org/junit/javadoc/3.8/" />
+            <doclet name="ydoc.doclets.YStandard"
+                path="${ydoc.home}/lib/ydoc.jar${ps}${ydoc.home}/lib/class2svg.jar${ps}${ydoc.home}/resources${ps}${ydoc.home}/doc">
+                <param name="-author" />
+                <param name="-generic" />
+                <param name="-umlautogen" />
+                <param name="-tag" value="y.precondition" />
+                <param name="-tag" value="y.postcondition" />
+                <param name="-tag" value="y.complexity" />
+                <param name="-tag" value="param" />
+                <param name="-tag" value="return" />
+                <param name="-tag" value="see" />
+                <param name="-tag" value="y.uml" />
+            </doclet>
+        </javadoc>
+    </target>
+
+    <target name="javadoc-pdf" depends="clean-stray-package-html">
+        <javadoc sourcepath="${src.dir}" classpathref="javadoc.classpath"
+            packagenames="net.hydromatic.clapham.*"
+            overview="${src.dir}/overview.html" author="true" source="1.6"
+            access="public">
+            <doclet name="com.tarsec.javadoc.pdfdoclet.PDFDoclet" path="${testlib.dir}/pdfdoclet.jar">
+                <param name="-pdf" value="${basedir}/doc/olap4j_api.pdf" />
+                <param name="-config" value="${basedir}/doc/pdfdoclet.properties" />
+            </doclet>
+        </javadoc>
+    </target>
+
+    <target name="clean-stray-package-html"
+            description="remove stray package.html files under classes to avoid
+                    'multiple sources of package comments' errors">
+        <delete includeEmptyDirs="false" quiet="true">
+            <fileset dir="${classes.dir}" includes="**/package.html" />
+            <fileset dir="${testclasses.dir}" includes="**/package.html" />
+        </delete>
+    </target>
+</project>
