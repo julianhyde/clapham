@@ -35,6 +35,8 @@
     <dependencies>
         <dependency org="junit" name="junit" rev="3.8.1"/>
         <dependency org="net.java.dev.javacc" name="javacc" rev="4.0"/>
+        <dependency org="xerces" name="xercesImpl" rev="2.6.0"
+                    transitive="false" />
         <dependency org="batik" name="batik-transcoder" rev="1.6"/>
         <dependency org="batik" name="batik-util" rev="1.6"/>
         <dependency org="batik" name="batik-awt-util" rev="1.6"/>

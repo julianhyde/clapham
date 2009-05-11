@@ -382,7 +382,7 @@ public class Clapham {
                             throw new RuntimeException(
                                 "-d option requires argument");
                         }
-                        outputDirName = arg;
+                        outputDirName = argIter.next();
                     } else if (arg.equals("--help")) {
                         usage(System.out);
                         return;
