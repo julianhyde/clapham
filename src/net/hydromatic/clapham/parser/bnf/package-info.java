@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // Clapham generates railroad diagrams to represent computer language grammars.
 // Copyright (C) 2008-2009 Julian Hyde
 //

@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // Clapham generates railroad diagrams to represent computer language grammars.
 // Copyright (C) 2008-2009 Julian Hyde
 //
@@ -38,7 +38,7 @@ import org.w3c.dom.Document;
  * Command line utility Clapham, the railroad diagram generator.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Sep 11, 2008
  */
 public class Clapham {

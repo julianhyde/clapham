@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // Clapham generates railroad diagrams to represent computer language grammars.
 // Copyright (C) 2008-2009 Julian Hyde
 //
@@ -23,7 +23,7 @@ package net.hydromatic.clapham.graph;
  * Constants for node kinds.
  *
  * @author jhyde
- * @version $Id: $
+ * @version $Id$
  * @since Aug 26, 2008
 */
 public enum NodeType {

@@ -20,8 +20,9 @@ implemented by the LucidDB database engine:</p>
 	<p><a href='farrago/BasicSequenceOption.svg'>
 	<img src='farrago/BasicSequenceOption.png'/></td></tr>
 </table>
-<p>Railroad charts are time-consuming to create and maintain by hand, so it 
-makes sense to automate creation</p>
+<p>Railroad charts are time-consuming to create and maintain by hand, and most 
+computer languages generate a parser from a grammar using a parser generator, so it 
+makes sense to automate creation. That is what Clapham does.</p>
 <h2>How Clapham works</h2>
 <p>Clapham is a batch program. It has an input file, a few options, and 
 generates output files.</p>
@@ -29,15 +30,17 @@ generates output files.</p>
 <p>The main input to Clapham is a definition of the grammar. Clapham supports 
 two meta-grammars (languages for specifying grammars):</p>
 <ul>
-	<li>Wirth Syntax Notation (WSN)</li>
-	<li>Extended Backus-Naur Form (BNF)</li>
+	<li><a href="http://en.wikipedia.org/wiki/Wirth_syntax_notation">Wirth Syntax Notation</a> (WSN)</li>
+	<li>Extended <a href="http://en.wikipedia.org/wiki/Backus-Naur_form">Backus-Naur Form</a> (BNF)</li>
 </ul>
 <h3>Output</h3>
 <p>Clapham can output:</p>
 <ul>
-	<li>Railroad diagrams in PNG format</li>
-	<li>Railroad diagrams in SVG format</li>
-	<li>An HTML page, index.html, containing a table of all symbols</li>
+	<li>Railroad diagrams in 
+	<a href="http://en.wikipedia.org/wiki/Portable_Network_Graphics">PNG</a> format</li>
+	<li>Railroad diagrams in 
+	<a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a> format</li>
+	<li>An HTML page, <code>index.html</code>, containing a table of all symbols</li>
 </ul>
 <h3>Options</h3>
 <p>There aren't many options right now. It does what it does. See the 
@@ -90,7 +93,7 @@ documenting itself.</p>
 <blockquote>
 	<p><code>CP=<br>
 	for i in lib/*.jar; do CP=$CP:$i; done<br>
-	java -cp $CP net.hydromatic.clapham.Clapham testsrc/net/hydromatic/clapham/example/wirth.bnf</code></p>
+	java -cp $CP net.hydromatic.clapham.Clapham -d wirth testsrc/net/hydromatic/clapham/example/wirth.bnf</code></p>
 </blockquote>
 <p>The following diagrams are generated:</p>
 <table border='2' id="table1" cellpadding="10" style="border-collapse: collapse" bgcolor="#C0C0C0">
@@ -105,9 +108,10 @@ documenting itself.</p>
 <p>Each syntax chart is a PNG file, but you can click through to an image in SVG 
 format.</p>
 <h3>Example #2. LucidDB SQL grammar</h3>
-<p>LucidDB is an open-source database released by the Eigenbase Foundation. Its 
-SQL grammar is specified in JavaCC. Clapham does not read JavaCC grammar files 
-yet, but JavaCC has a utility jjdoc that generates a web page in BNF, and 
+<p><a href="http://www.luciddb.org/">LucidDB</a> is an open-source database released by the Eigenbase Foundation. Its 
+SQL grammar is specified in <a href="https://javacc.dev.java.net/">JavaCC</a>. Clapham does not read JavaCC grammar files 
+(yet), but JavaCC has a utility jjdoc that 
+<a href="http://farrago.sourceforge.net/combinedParserBnf.html">generates a web page in BNF</a>, and 
 Clapham can read that.</p>
 <p>Here are some of the charts generated.&nbsp; The full set is
 <a href="farrago/index.html">here</a>.</p>
@@ -167,7 +171,33 @@ welcome!)</p>
 	so, where to wrap. Which chart optimizations to perform, specified globally, 
 	but can be overridden for a particular chart.</li>
 </ul>
+<h2>Getting started</h2>
+<ol>
+	<li>Download the source distribution from
+	<a href="https://sourceforge.net/projects/clapham">SourceForge</a>, and 
+	unzip. (Or to get the latest, use svn and checkout trunk.)</li>
+	<li>Install JDK 1.6.0 or later, and ant 1.7.0 or later.</li>
+	<li>To build, type '<code>ant jar</code>' in the root directory of the 
+	source distribution.</li>
+	<li>Run the <code>wirth.bnf</code> example described above.</li>
+	<li>Write your own grammar, and try Clapham on that.</li>
+</ol>
+<h2>Resources</h2>
+<ul>
+	<li><a href="http://clapham.hydromatic.net">Home page</a></li>
+	<li><a href="http://sourceforge.net/projects/clapham">Clapham project at 
+	SourceForge.net</a></li>
+	<li>If you have comments or questions, post to the
+	<a href="https://sourceforge.net/forum/forum.php?forum_id=881883">Open 
+	Discussion</a> forum.</li>
+	<li><a href="http://julianhyde.blogspot.com">Julian's blog</a></li>
+</ul>
+<h2>Acknowledgements</h2>
+<p>I was inspired by <a href="http://dotnet.jku.at/applications/Visualizer/">
+EBNF Visualizer</a>, written by Stefan Schoergenhumer and Markus Dopler 
+supported by Hanspeter Moessenboeck, University of Linz, but I wanted a tool that ran in batch mode. I used some of 
+their code for the graph package, and had fun translating it from C# to Java.</p>
 <hr>
 <p><font size="2">Clapham Railroad Diagram Generator<br>
 Copyright (C) 2009-2009 Julian Hyde<br>
-$Id: $</font></p>
+$Id$</font></p>

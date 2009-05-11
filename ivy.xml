@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://ivyrep.jayasoft.org/ivy-doc.xsl"?>
 <!--
-  == $Id: $
+  == $Id$
   == Clapham generates railroad diagrams to represent computer language grammars.
   == Copyright (C) 2009-2009 Julian Hyde
   ==
@@ -25,10 +25,9 @@
     xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 
     <info organisation="net.hydromatic" module="clapham" revision="0.1">
-        <license name="GPL" url="http://www.gnu.org/licenses/gpl.html"/>
+        <license name="GPL" url="http://www.gnu.org/licenses/gpl-2.0.html"/>
         <ivyauthor name="Julian Hyde" />
-        <repository name="julian-rep" url="http://repo.hydromatic.net"/>
-        <description homepage="http://www.hydromatic.net">
+        <description homepage="http://clapham.hydromatic.net">
             Clapham generates railroad diagrams from BNF grammar files.
         </description>
     </info>

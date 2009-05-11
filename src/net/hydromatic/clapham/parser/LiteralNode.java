@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // Clapham generates railroad diagrams to represent computer language grammars.
 // Copyright (C) 2008-2009 Julian Hyde
 //
@@ -23,7 +23,7 @@ package net.hydromatic.clapham.parser;
  * TODO:
 *
 * @author jhyde
-* @version $Id: $
+* @version $Id$
 * @since Jul 30, 2008
 */
 public class LiteralNode implements EbnfNode {

@@ -1,7 +1,8 @@
 /*
-// $Id: $
+// $Id$
 // Clapham generates railroad diagrams to represent computer language grammars.
 // Copyright (C) 2008-2009 Julian Hyde
+// Copyright (c) 2005 Stefan Schoergenhumer, Markus Dopler
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -27,7 +28,7 @@ import java.io.PrintStream;
  * TODO:
 *
 * @author jhyde
-* @version $Id: $
+* @version $Id$
 * @since Aug 26, 2008
 */
 public class Grammar {

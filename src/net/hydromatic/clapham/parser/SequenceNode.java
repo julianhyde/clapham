@@ -1,5 +1,5 @@
 /*
-// $Id: $
+// $Id$
 // Clapham generates railroad diagrams to represent computer language grammars.
 // Copyright (C) 2008-2009 Julian Hyde
 //
@@ -27,7 +27,7 @@ import java.util.List;
  * TODO:
 *
 * @author jhyde
-* @version $Id: $
+* @version $Id$
 * @since Jul 30, 2008
 */
 public class SequenceNode implements EbnfNode {
