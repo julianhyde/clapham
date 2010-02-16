@@ -20,8 +20,10 @@
 */
 package net.hydromatic.clapham.graph;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
 
+import net.hydromatic.clapham.chart.Chart;
 /**
  * TODO:
  *
@@ -32,16 +34,12 @@ import java.awt.*;
 public class TextBox {
     private final Chart chart;
     private final String text;
-    private final Font font;
-    private final Color color;
     final int width;
     final int height;
 
     TextBox(Chart chart, String text, Font font, Color color) {
         this.chart = chart;
         this.text = text;
-        this.font = font;
-        this.color = color;
         this.width = chart.getStringWidth(font, text);
         this.height = chart.getFontHeight();
 
@@ -52,7 +50,7 @@ public class TextBox {
         x -= this.width / 2f;
         float y = y1 + height / 2f;
         y += this.height / 2f;
-        chart.drawString(text, font, color, x, y);
+        chart.drawString(text, x, y);
     }
 }
 

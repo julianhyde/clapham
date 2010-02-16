@@ -43,7 +43,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.hydromatic.clapham.graph.Chart;
+import net.hydromatic.clapham.chart.Chart;
+import net.hydromatic.clapham.chart.java2d.Java2DChart;
 import net.hydromatic.clapham.graph.Grammar;
 import net.hydromatic.clapham.graph.Graph;
 import net.hydromatic.clapham.graph.NodeType;
@@ -186,7 +187,7 @@ public class Clapham {
                 DocumentBuilderFactory.newInstance().newDocumentBuilder();
             final Document document = documentBuilder.newDocument();
             final SVGGraphics2D graphics = new SVGGraphics2D(document);
-            final Chart chart = new Chart(grammar, graphics);
+            final Chart chart = new Java2DChart(grammar, graphics);
             chart.calcDrawing();
             chart.drawComponent(symbol);
 
