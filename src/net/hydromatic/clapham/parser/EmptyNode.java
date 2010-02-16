@@ -19,6 +19,9 @@
 */
 package net.hydromatic.clapham.parser;
 
+import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.Graph;
+
 /**
  * TODO:
 *
@@ -26,11 +29,17 @@ package net.hydromatic.clapham.parser;
 * @version $Id$
 * @since Jul 30, 2008
 */
-public class EmptyNode implements EbnfNode {
+public class EmptyNode extends BaseEbnfNode {
 
     public EmptyNode() {
     }
 
+    public Graph toGraph(Grammar grammar) {
+		Graph g = new Graph();
+		grammar.makeEpsilon(g);
+		return g;
+	}
+    
     public void toString(StringBuilder buf) {
         buf.append("EmptyNode");
     }

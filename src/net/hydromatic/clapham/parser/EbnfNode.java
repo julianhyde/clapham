@@ -16,18 +16,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package net.hydromatic.clapham.parser;
+
+import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.Graph;
 
 /**
  * TODO:
-*
-* @author jhyde
-* @version $Id$
-* @since Jul 30, 2008
-*/
+ * 
+ * @author jhyde
+ * @version $Id$
+ * @since Jul 30, 2008
+ */
 public interface EbnfNode {
-    void toString(StringBuilder buf);
+
+	/**
+	 * Return a {@link Graph} that represent this ebnf expression
+	 * 
+	 * @param grammar
+	 * @return A {@link Graph} that represent this ebnf expression
+	 */
+	Graph toGraph(Grammar grammar);
+
+	void toString(StringBuilder buf);
 }
 
 // End EbnfNode.java

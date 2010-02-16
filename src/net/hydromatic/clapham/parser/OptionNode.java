@@ -19,6 +19,9 @@
 */
 package net.hydromatic.clapham.parser;
 
+import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.Graph;
+
 /**
  * TODO:
 *
@@ -26,12 +29,18 @@ package net.hydromatic.clapham.parser;
 * @version $Id$
 * @since Jul 30, 2008
 */
-public class OptionNode implements EbnfNode {
+public class OptionNode extends BaseEbnfNode {
     public final EbnfNode n;
 
     public OptionNode(EbnfNode n) {
         this.n = n;
     }
+    
+    public Graph toGraph(Grammar grammar) {
+		final Graph g = n.toGraph(grammar);
+		grammar.makeOption(g);
+		return g;
+	}
 
     public void toString(StringBuilder buf) {
         buf.append("OptionNode(");

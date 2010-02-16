@@ -19,9 +19,10 @@
 */
 package net.hydromatic.clapham.parser;
 
-import net.hydromatic.clapham.parser.wirth.WirthParser;
-
 import java.util.List;
+
+import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.Graph;
 
 /**
  * TODO:
@@ -30,15 +31,29 @@ import java.util.List;
 * @version $Id$
 * @since Jul 30, 2008
 */
-public class AlternateNode implements EbnfNode {
+public class AlternateNode extends BaseEbnfNode {
     public final List<EbnfNode> list;
 
     public AlternateNode(List<EbnfNode> list) {
         this.list = list;
     }
+    
+    public Graph toGraph(Grammar grammar) {
+		Graph g = null;
+		for (EbnfNode node : list) {
+			if (g == null) {
+				g = node.toGraph(grammar);
+				grammar.makeFirstAlt(g);
+			} else {
+				Graph g2 = node.toGraph(grammar);
+				grammar.makeAlternative(g, g2);
+			}
+		}
+		return g;
+	}
 
     public void toString(StringBuilder buf) {
-        WirthParser.toString(buf, "AlternateNode(", list, ")");
+        toString(buf, "AlternateNode(", list, ")");
     }
 }
 

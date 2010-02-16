@@ -19,6 +19,9 @@
 */
 package net.hydromatic.clapham.parser;
 
+import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.Graph;
+
 /**
  * TODO:
 *
@@ -26,7 +29,7 @@ package net.hydromatic.clapham.parser;
 * @version $Id$
 * @since Jul 30, 2008
 */
-public class ProductionNode implements EbnfNode {
+public class ProductionNode extends BaseEbnfNode {
     public final IdentifierNode id;
     public final EbnfNode expression;
 
@@ -37,6 +40,10 @@ public class ProductionNode implements EbnfNode {
         this.id = id;
         this.expression = expression;
     }
+    
+    public Graph toGraph(Grammar grammar) {
+		return expression.toGraph(grammar);
+	}
 
     public void toString(StringBuilder buf) {
         id.toString(buf);

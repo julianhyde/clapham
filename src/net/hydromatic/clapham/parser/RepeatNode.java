@@ -19,6 +19,9 @@
 */
 package net.hydromatic.clapham.parser;
 
+import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.Graph;
+
 /**
  * TODO:
 *
@@ -26,12 +29,18 @@ package net.hydromatic.clapham.parser;
 * @version $Id$
 * @since Jul 30, 2008
 */
-public class RepeatNode implements EbnfNode {
+public class RepeatNode extends BaseEbnfNode {
     public final EbnfNode node;
 
     public RepeatNode(EbnfNode list) {
         this.node = list;
     }
+    
+    public Graph toGraph(Grammar grammar) {
+		final Graph g = node.toGraph(grammar);
+		grammar.makeIteration(g);
+		return g;
+	}
 
     public void toString(StringBuilder buf) {
         buf.append("RepeatNode(");

@@ -19,6 +19,9 @@
 */
 package net.hydromatic.clapham.parser;
 
+import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.Graph;
+
 // End RepeatNode.java
 
 /**
@@ -28,12 +31,18 @@ package net.hydromatic.clapham.parser;
 * @version $Id$
 * @since Jul 30, 2008
 */
-public class MandatoryRepeatNode implements EbnfNode {
+public class MandatoryRepeatNode extends BaseEbnfNode {
     public final EbnfNode node;
 
     public MandatoryRepeatNode(EbnfNode list) {
         this.node = list;
     }
+    
+    public Graph toGraph(Grammar grammar) {
+		final Graph g = node.toGraph(grammar);
+		grammar.makeIteration(g); // TODO: make mandatory
+		return g;
+	}
 
     public void toString(StringBuilder buf) {
         buf.append("MandatoryRepeatNode(");

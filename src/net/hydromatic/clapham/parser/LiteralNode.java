@@ -19,6 +19,12 @@
 */
 package net.hydromatic.clapham.parser;
 
+import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.Graph;
+import net.hydromatic.clapham.graph.Node;
+import net.hydromatic.clapham.graph.NodeType;
+import net.hydromatic.clapham.graph.Symbol;
+
 /**
  * TODO:
 *
@@ -26,12 +32,20 @@ package net.hydromatic.clapham.parser;
 * @version $Id$
 * @since Jul 30, 2008
 */
-public class LiteralNode implements EbnfNode {
+public class LiteralNode extends BaseEbnfNode {
     public final String s;
 
     public LiteralNode(String s) {
         this.s = s;
     }
+    
+    public Graph toGraph(Grammar grammar) {
+		Symbol symbol = new Symbol(NodeType.TERM, s);
+		grammar.terminals.add(symbol);
+		// grammar.symbolMap.put(symbol.name, symbol);
+		Graph graph = new Graph(new Node(grammar, symbol));
+		return graph;
+	}
 
     public void toString(StringBuilder buf) {
         buf.append('"').append(s).append('"');

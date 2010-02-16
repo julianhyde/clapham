@@ -19,18 +19,44 @@
 */
 package net.hydromatic.clapham;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import net.hydromatic.clapham.graph.Chart;
+import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.Graph;
+import net.hydromatic.clapham.graph.NodeType;
+import net.hydromatic.clapham.graph.Symbol;
+import net.hydromatic.clapham.parser.ProductionNode;
 import net.hydromatic.clapham.parser.bnf.BnfParser;
 import net.hydromatic.clapham.parser.bnf.ParseException;
-import net.hydromatic.clapham.parser.*;
 import net.hydromatic.clapham.parser.wirth.WirthParser;
-import net.hydromatic.clapham.graph.*;
-
-import javax.xml.parsers.*;
-import java.io.*;
-import java.util.*;
 
 import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.transcoder.*;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.w3c.dom.Document;
 
@@ -450,78 +476,13 @@ public class Clapham {
             Symbol symbol = new Symbol(NodeType.NONTERM, productionNode.id.s);
             grammar.nonterminals.add(symbol);
             grammar.symbolMap.put(symbol.name, symbol);
-            Graph g = toGraph(grammar, productionNode.expression);
+            Graph g = productionNode.toGraph(grammar);
             symbol.graph = g;
             grammar.ruleMap.put(symbol, g);
         }
         return grammar;
     }
-
-    public static Graph toGraph(
-        Grammar grammar,
-        EbnfNode expression)
-    {
-        if (expression instanceof OptionNode) {
-            OptionNode optionNode = (OptionNode) expression;
-            final Graph g = toGraph(grammar, optionNode.n);
-            grammar.makeOption(g);
-            return g;
-        } else if (expression instanceof RepeatNode) {
-            RepeatNode repeatNode = (RepeatNode) expression;
-            final Graph g = toGraph(grammar, repeatNode.node);
-            grammar.makeIteration(g);
-            return g;
-        } else if (expression instanceof MandatoryRepeatNode) {
-            MandatoryRepeatNode repeatNode = (MandatoryRepeatNode) expression;
-            final Graph g = toGraph(grammar, repeatNode.node);
-            grammar.makeIteration(g); // TODO: make mandatory
-            return g;
-        } else if (expression instanceof AlternateNode) {
-            AlternateNode alternateNode = (AlternateNode) expression;
-            Graph g = null;
-            for (EbnfNode node : alternateNode.list) {
-                if (g == null) {
-                    g = toGraph(grammar, node);
-                    grammar.makeFirstAlt(g);
-                } else {
-                    Graph g2 = toGraph(grammar, node);
-                    grammar.makeAlternative(g, g2);
-                }
-            }
-            return g;
-        } else if (expression instanceof SequenceNode) {
-            SequenceNode sequenceNode = (SequenceNode) expression;
-            Graph g = null;
-            for (EbnfNode node : sequenceNode.list) {
-                if (g == null) {
-                    g = toGraph(grammar, node);
-                } else {
-                    Graph g2 = toGraph(grammar, node);
-                    grammar.makeSequence(g, g2);
-                }
-            }
-            return g;
-        } else if (expression instanceof EmptyNode) {
-            Graph g = new Graph();
-            grammar.makeEpsilon(g);
-            return g;
-        } else if (expression instanceof IdentifierNode) {
-            IdentifierNode identifierNode = (IdentifierNode) expression;
-            Symbol symbol = new Symbol(NodeType.NONTERM, identifierNode.s);
-//            grammar.symbolMap.put(symbol.name, symbol);
-            return new Graph(new Node(grammar, symbol));
-        } else if (expression instanceof LiteralNode) {
-            LiteralNode literalNode = (LiteralNode) expression;
-            Symbol symbol = new Symbol(NodeType.TERM, literalNode.s);
-            grammar.terminals.add(symbol);
-//            grammar.symbolMap.put(symbol.name, symbol);
-            return new Graph(new Node(grammar, symbol));
-        } else {
-            throw new UnsupportedOperationException(
-                "unknown node type " + expression);
-        }
-    }
-
+   
     public static void toPng(File inFile, File file)
         throws IOException, TranscoderException
     {
