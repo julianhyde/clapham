@@ -26,10 +26,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
-import java.awt.geom.Point2D;
 
 import net.hydromatic.clapham.chart.Chart;
 import net.hydromatic.clapham.graph.Grammar;
@@ -143,8 +143,8 @@ public class Java2DChart implements Chart {
 		return new Dimension((int) xMax + 10, (int) yMax + 10);
 	}
 
-	public int getStringWidth(Font font, String text) {
-		g.setFont(font);
+	public int getStringWidth(String text) {
+		g.setFont(charFont);
 		final FontRenderContext context = g.getFontRenderContext();
 		final GlyphVector glyphVector = this.charFont.layoutGlyphVector(
 				context, text.toCharArray(), 0, text.length(), 0);
@@ -154,7 +154,7 @@ public class Java2DChart implements Chart {
 		return (int) width;
 	}
 
-	public void drawString(String text, float x, float y) {
+	public void drawString(String text, int x, int y) {
 		// g.setFont(getf);
 		// g.setColor(color);
 		g.drawString(text, x, y);
@@ -258,8 +258,7 @@ public class Java2DChart implements Chart {
 		g.drawLine(beginningXCoordinate - componentGapWidth / 4
 				- componentArcSize / 2, (int) s.graph.l.posLine.y,
 				beginningXCoordinate, (int) s.graph.l.posLine.y);
-		Point2D.Float p = new Point2D.Float(beginningXCoordinate,
-				beginningYCoordinate - 30);
+		Point p = new Point(beginningXCoordinate, beginningYCoordinate - 30);
 		s.graph.l.drawComponents(this, p, s.graph.graphSize);
 		// final SizeMapper sizeMapper = new SizeMapper();
 		// s.graph.l.accept(sizeMapper);
@@ -283,13 +282,8 @@ public class Java2DChart implements Chart {
 	}
 
 	// draws arrows for different directions
-	public void drawArrow(float x1, float y1, float x2, float y2,
-			Grammar.Direction direction) {
-		drawArrow((int) x1, (int) y1, (int) x2, (int) y2, direction);
-	}
-
-	private void drawArrow(int x1, int y1, int x2, int y2,
-			Grammar.Direction direction) {
+	public void drawArrow(int x1, int y1, int x2, int y2,
+			Chart.Direction direction) {
 		expandBounds(x1, y1);
 		expandBounds(x2, y2);
 		g.setColor(lineColor);
@@ -338,7 +332,7 @@ public class Java2DChart implements Chart {
 		}
 	}
 
-	public void drawArc(float x, float y, float width, float height,
+	public void drawArc(int x, int y, int width, int height,
 			int startAngleF, int arcAngle) {
 		expandBounds(x - width, y - height);
 		expandBounds(x + width, y - height);
@@ -353,23 +347,23 @@ public class Java2DChart implements Chart {
 								: startAngle, (int) arcAngle);
 	}
 
-	public void drawArcCorner(float x, float y, float arcSize, int startAngle) {
+	public void drawArcCorner(int x, int y, int arcSize, int startAngle) {
 		drawArc(x, y, arcSize, arcSize, startAngle, 90);
 	}
 
-	public void drawArcCorner(float x, float y, int startAngle) {
+	public void drawArcCorner(int x, int y, int startAngle) {
 		drawArc(x, y, componentArcSize, componentArcSize, startAngle, 90);
 	}
 
-	public void drawLine(float x, float y, float x1, float y1) {
-		expandBounds(x, y);
+	public void drawLine(int x1, int y1, int x2, int y2) {
 		expandBounds(x1, y1);
+		expandBounds(x2, y2);
 		g.setColor(lineColor);
 		g.setStroke(lineStroke);
-		g.drawLine((int) x, (int) y, (int) x1, (int) y1);
+		g.drawLine(x1, y1, x2, y2);
 	}
 
-	public void drawRectangle(float x, float y, float width, float height) {
+	public void drawRectangle(int x, int y, int width, int height) {
 		expandBounds(x, y);
 		expandBounds(x + width, y + height);
 		g.drawRect((int) x, (int) y, (int) width, (int) height);
@@ -388,11 +382,11 @@ public class Java2DChart implements Chart {
 			node.visitChildren(this);
 		}
 
-		private void foo(Point2D.Float pos) {
-			x1 = Math.min(x1, (int) pos.x);
-			y1 = Math.min(y1, (int) pos.y);
-			x2 = Math.max(x2, (int) pos.x);
-			y2 = Math.max(y2, (int) pos.y);
+		private void foo(Point pos) {
+			x1 = Math.min(x1, pos.x);
+			y1 = Math.min(y1, pos.y);
+			x2 = Math.max(x2, pos.x);
+			y2 = Math.max(y2, pos.y);
 		}
 
 		Dimension getDimension() {
@@ -408,13 +402,13 @@ public class Java2DChart implements Chart {
 	}
 
 	@Override
-	public float beginningXCoordinate() {
+	public int beginningXCoordinate() {
 		return beginningXCoordinate;
 	}
 
 	@Override
-	public float componentArcSize() {
-		return defaultComponentArcSize;
+	public int componentArcSize() {
+		return componentArcSize;
 	}
 
 	@Override

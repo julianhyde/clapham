@@ -28,10 +28,10 @@ package net.hydromatic.clapham.graph;
  * @since Jul 30, 2008
  */
 public class Size {
-    private float width;
-    private float height;
+    private int width;
+    private int height;
 
-    public Size(float width, float height) {
+    public Size(int width, int height) {
         this.width = width;
         this.height = height;
     }
@@ -44,35 +44,35 @@ public class Size {
         return width + "x" + height;
     }
 
-    public void setHeight(float height) {
+    public void setHeight(int height) {
         this.height = height;
     }
 
-    public float getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public float getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    public void setWidth(float width) {
+    public void setWidth(int width) {
         this.width = width;
     }
 
-    public void maxHeight(float height) {
+    public void maxHeight(int height) {
         if (height > this.height) {
             this.height = height;
         }
     }
 
-    public void maxWidth(float width) {
+    public void maxWidth(int width) {
         if (width > this.width) {
             this.width = width;
         }
     }
 
-    public void incWidth(float width) {
+    public void incWidth(int width) {
         this.width += width;
     }
 

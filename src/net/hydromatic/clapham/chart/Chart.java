@@ -1,21 +1,22 @@
 package net.hydromatic.clapham.chart;
 
-import java.awt.Font;
-
 import net.hydromatic.clapham.graph.Node;
 import net.hydromatic.clapham.graph.Symbol;
-import net.hydromatic.clapham.graph.Grammar.Direction;
 
 /**
  * 
  * @author Edgar Espina
- *
+ * 
  */
 public interface Chart {
-	
+
+	public enum Direction {
+		LEFT, RIGHT, UP, DOWN
+	}
+
 	interface NodeVisitor {
-        void visit(Node node);
-    }
+		void visit(Node node);
+	}
 
 	/**
 	 * The font height
@@ -26,37 +27,44 @@ public interface Chart {
 
 	/**
 	 * The component gap height
+	 * 
 	 * @return
 	 */
 	int componentGapHeight();
 
-	int getStringWidth(Font font, String text);
+	/**
+	 * The string width of the text
+	 * 
+	 * @param text
+	 * @return
+	 */
+	int getStringWidth(String text);
 
-	void drawString(String text, float x, float y);
+	void drawString(String text, int x, int y);
 
 	int symbolGapHeight();
 
 	int symbolGapWidth();
 
-	float componentArcSize();
+	int componentArcSize();
 
 	int componentGapWidth();
 
 	boolean showBorders();
 
-	void drawRectangle(float x, float f, float width, float height);
+	void drawRectangle(int x, int y, int width, int height);
 
-	void drawArcCorner(float x, float y, float foo, int i);
+	void drawArcCorner(int x, int y, int arcSize, int angle);
 
-	void drawLine(float f, float y, float g, float y2);
+	void drawLine(int x1, int y1, int x2, int y2);
 
-	void drawArrow(float x, float y, float x2, float y2, Direction right);
+	void drawArrow(int x1, int y1, int x2, int y2, Direction right);
 
-	void drawArcCorner(float f, float y, int i);
+	void drawArcCorner(int x, int y, int arcSize);
 
-	float beginningXCoordinate();
+	int beginningXCoordinate();
 
-	void drawArc(float x, float y, float foo, float foo2, int i, int j);
+	void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle);
 
 	int arrowSize();
 

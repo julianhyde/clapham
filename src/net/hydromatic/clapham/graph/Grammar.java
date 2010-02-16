@@ -692,13 +692,6 @@ public class Grammar {
         g.r = g.l;
     }
 
-    public enum Direction {
-        LEFT,
-        RIGHT,
-        UP,
-        DOWN
-    }
-
     /**
      * Finds a terminal or non-terminal with a given name.
      *

@@ -20,7 +20,7 @@
  */
 package net.hydromatic.clapham.graph;
 
-import java.awt.geom.Point2D.Float;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,11 +74,14 @@ public class Node {
 	private Size iterSize = new Size(0, 0); // the size of the second component
 	// in the special rerun Node
 	// (itergraph!=null)
-	public final Float posBegin = new Float(0, 0); // the point in the left above
+	public final Point posBegin = new Point(0, 0); // the point in the left
+	// above
 	// corner of the component
-	public final Float posLine = new Float(0, 0); // the point of the line of
+	public final Point posLine = new Point(0, 0); // the point of the line of
 	// the component
-	public final Float posEnd = new Float(0, 0); // the point in the left down corner
+	public final Point posEnd = new Point(0, 0); // the point in the left down
+
+	// corner
 
 	// of the component
 
@@ -137,7 +140,7 @@ public class Node {
 	// calculates the size if there are wraps in the rule
 	public void setWrapSize(Chart chart) {
 		Node n = this;
-		float maxH = 0;
+		int maxH = 0;
 		while (n != null) {
 			n.firstLevel = true;
 			switch (n.typ) {
@@ -239,7 +242,7 @@ public class Node {
 			case ALT: {
 				Node a = n;
 				int maxH = -chart.componentGapHeight();
-				float maxW = 0;
+				int maxW = 0;
 				while (a != null) {
 					a.size = a.sub.calcSize(chart);
 					maxH += a.size.getHeight();
@@ -335,7 +338,7 @@ public class Node {
 	/**
 	 * Calculates the horizontal position of the symbols.
 	 */
-	public void calcPos(Chart chart, float posBegin) {
+	public void calcPos(Chart chart, int posBegin) {
 		Node n = this; // current node in the level
 		int realHeight = calcHeight(chart);
 		boolean samelevel = true; // next node in same level?
@@ -415,7 +418,7 @@ public class Node {
 	 * sub-components for a recursive call, or if applicable, a call to the
 	 * {@link #drawComponentsInverse} method.
 	 */
-	public void drawComponents(Chart chart, Float p, Size s) {
+	public void drawComponents(Chart chart, Point p, Size s) {
 		Node n = this; // current node in the level
 		boolean samelevel = true; // next node in same level?
 
@@ -430,21 +433,21 @@ public class Node {
 				}
 				if (n.typ == NodeType.TERM) {
 					// the quarter Arcs
-					final float foo = (n.size.getHeight() - chart
+					final int arcSize = (n.size.getHeight() - chart
 							.componentGapHeight()) / 2;
-					chart.drawArcCorner(p.x, n.posBegin.y, foo, 180);
-					chart.drawArcCorner(p.x, n.posLine.y, foo, 90);
-					chart.drawArcCorner(p.x + n.size.getWidth() - foo,
-							n.posBegin.y, foo, 270);
-					chart.drawArcCorner(p.x + n.size.getWidth() - foo,
-							n.posLine.y, foo, 0);
+					chart.drawArcCorner(p.x, n.posBegin.y, arcSize, 180);
+					chart.drawArcCorner(p.x, n.posLine.y, arcSize, 90);
+					chart.drawArcCorner(p.x + n.size.getWidth() - arcSize,
+							n.posBegin.y, arcSize, 270);
+					chart.drawArcCorner(p.x + n.size.getWidth() - arcSize,
+							n.posLine.y, arcSize, 0);
 
 					n.textBox.drawAtCenter(p.x, n.posBegin.y, n.size.getWidth()
-							- foo, n.posLine.y - n.posBegin.y);
+							- arcSize, n.posLine.y - n.posBegin.y);
 
 					// the short vertical and horizontal lines between the
 					// quarter Arcs
-					final float quarterHeight = (n.size.getHeight() - chart
+					final int quarterHeight = (n.size.getHeight() - chart
 							.componentGapHeight()) / 4;
 					chart.drawLine(p.x + quarterHeight - 1, n.posBegin.y, p.x
 							+ n.size.getWidth() - quarterHeight + 1,
@@ -486,7 +489,7 @@ public class Node {
 											.getFontHeight()) / 2);
 				}
 				chart.drawArrow(p.x, n.posLine.y, p.x, n.posLine.y,
-						Grammar.Direction.RIGHT);
+						Chart.Direction.RIGHT);
 				p.x += n.size.getWidth();
 				// draw lines between t and nt nodes
 				if (!n.up
@@ -494,14 +497,14 @@ public class Node {
 						&& (n.next.typ == NodeType.TERM || n.next.typ == NodeType.NONTERM)) {
 					chart.drawArrow(p.x, n.posLine.y, p.x
 							+ chart.componentGapWidth() / 2, n.posLine.y,
-							Grammar.Direction.RIGHT);
+							Chart.Direction.RIGHT);
 					p.x += chart.componentGapWidth() / 2;
 				}
 				if (!n.up && n.next != null && n.next.typ == NodeType.WRAP
 						&& n.next.size.getHeight() == 0) {
 					chart.drawArrow(p.x, n.posLine.y, p.x
 							+ chart.componentGapWidth() / 2, n.posLine.y,
-							Grammar.Direction.RIGHT);
+							Chart.Direction.RIGHT);
 					p.x += chart.componentGapWidth() / 2;
 				}
 				break;
@@ -564,7 +567,7 @@ public class Node {
 						- chart.componentArcSize() + n.size.getWidth() + 1,
 						n.posEnd.y - chart.componentGapHeight() / 2);
 
-				n.sub.drawComponents(chart, new Float(p.x
+				n.sub.drawComponents(chart, new Point(p.x
 						+ chart.componentGapWidth(), 0), n.size);
 				p.x += n.size.getWidth();
 				break;
@@ -620,7 +623,7 @@ public class Node {
 							- chart.componentArcSize() + n.size.getWidth() + 1,
 							n.posEnd.y - chart.componentGapHeight() / 2);
 
-					n.sub.drawComponents(chart, new Float(p.x
+					n.sub.drawComponents(chart, new Point(p.x
 							+ chart.componentGapWidth(), 0), n.size);
 					p.x += n.size.getWidth();
 				} else {
@@ -679,10 +682,10 @@ public class Node {
 									+ n.size.getWidth() + 1,
 							n.itergraph.posLine.y);
 
-					n.itergraph.drawComponentsInverse(chart, new Float(
+					n.itergraph.drawComponentsInverse(chart, new Point(
 							p.x + n.size.getWidth() / 2 + n.iterSize.getWidth()
 									/ 2, n.posEnd.y), n.size);
-					n.sub.drawComponents(chart, new Float(p.x
+					n.sub.drawComponents(chart, new Point(p.x
 							+ n.size.getWidth() / 2 - n.altSize.getWidth() / 2,
 							n.posEnd.y), n.size);
 					p.x += n.size.getWidth();
@@ -733,7 +736,7 @@ public class Node {
 				chart.drawLine(p.x, n.posLine.y, p.x + n.size.getWidth(),
 						n.posLine.y);
 
-				n.sub.drawComponentsInverse(chart, new Float(p.x
+				n.sub.drawComponentsInverse(chart, new Point(p.x
 						- chart.componentGapWidth() + n.size.getWidth(), 0),
 						n.size);
 				p.x += n.size.getWidth();
@@ -756,12 +759,12 @@ public class Node {
 					chart.drawArcCorner(p.x + chart.componentGapWidth() / 4
 							- chart.componentArcSize() / 2, n.posEnd.y
 							- chart.componentArcSize(), 0);
-					chart.drawArcCorner((float) (chart.beginningXCoordinate()
-							- chart.componentGapWidth() / 4 - chart
-							.componentArcSize() / 2), n.posEnd.y, 180);
-					chart.drawArcCorner((float) (chart.beginningXCoordinate()
-							- chart.componentGapWidth() / 4 - chart
-							.componentArcSize() / 2), n.next.posLine.y
+					chart.drawArcCorner(chart.beginningXCoordinate()
+							- chart.componentGapWidth() / 4
+							- chart.componentArcSize() / 2, n.posEnd.y, 180);
+					chart.drawArcCorner(chart.beginningXCoordinate()
+							- chart.componentGapWidth() / 4
+							- chart.componentArcSize() / 2, n.next.posLine.y
 							- chart.componentArcSize(), 90);
 					// the short vertical lines between the quarter Arcs
 					chart.drawLine(p.x + chart.componentGapWidth() / 4
@@ -839,7 +842,7 @@ public class Node {
 								+ n.altSize.getWidth(), a.posLine.y
 								- chart.componentArcSize() / 2 + 1);
 					}
-					a.sub.drawComponents(chart, new Float(p.x
+					a.sub.drawComponents(chart, new Point(p.x
 							+ (n.altSize.getWidth() - a.size.getWidth()) / 2,
 							a.posEnd.y), a.size);
 					a = a.down;
@@ -858,7 +861,7 @@ public class Node {
 				chart.drawArrow(p.x + chart.componentGapWidth() / 4
 						+ chart.arrowSize(), n.posLine.y, p.x
 						+ chart.componentGapWidth() / 4 + chart.arrowSize(),
-						n.posLine.y, Grammar.Direction.RIGHT);
+						n.posLine.y, Chart.Direction.RIGHT);
 			}
 			n = n.next;
 		}
@@ -868,10 +871,10 @@ public class Node {
 	 * Draw the components from right to left. Needed if for example in an
 	 * iter-node.
 	 */
-	void drawComponentsInverse(Chart chart, Float p, Size s) {
+	void drawComponentsInverse(Chart chart, Point p, Size s) {
 		Node n = this; // current node in the level
 		boolean samelevel = true; // next node in same level?
-		Float p1 = new Float(0, 0);
+		Point p1 = new Point(0, 0);
 
 		while (n != null && samelevel) {
 			p.x -= n.size.getWidth();
@@ -883,7 +886,7 @@ public class Node {
 				}
 				if (n.typ == NodeType.TERM) {
 					// the quarter Arcs
-					final float foo = (n.size.getHeight() - chart
+					final int foo = (n.size.getHeight() - chart
 							.componentGapHeight()) / 2;
 					chart.drawArc(p.x, n.posBegin.y, foo, foo, 180, 90);
 					chart.drawArc(p.x, n.posLine.y, foo, foo, 90, 90);
@@ -931,15 +934,14 @@ public class Node {
 										.componentGapHeight())
 								- chart.symbolGapHeight());
 				chart.drawArrow(p.x + n.size.getWidth(), n.posLine.y, p.x
-						+ n.size.getWidth(), n.posLine.y,
-						Grammar.Direction.LEFT);
+						+ n.size.getWidth(), n.posLine.y, Chart.Direction.LEFT);
 
 				if (!n.up
 						&& n.next != null
 						&& (n.next.typ == NodeType.TERM || n.next.typ == NodeType.NONTERM)) {
 					chart.drawArrow(p.x, n.posLine.y, p.x
 							- chart.componentGapWidth() / 2, n.posLine.y,
-							Grammar.Direction.LEFT);
+							Chart.Direction.LEFT);
 					p.x -= chart.componentGapWidth() / 2;
 				}
 				if (!n.up && n.next != null && n.next.typ == NodeType.WRAP
@@ -949,7 +951,7 @@ public class Node {
 							&& (n.next.next.typ == NodeType.TERM || n.next.next.typ == NodeType.NONTERM)) {
 						chart.drawArrow(p.x, n.posLine.y, p.x
 								- chart.componentGapWidth() / 2, n.posLine.y,
-								Grammar.Direction.LEFT);
+								Chart.Direction.LEFT);
 						p.x -= chart.componentGapWidth() / 2;
 					}
 				}
@@ -1116,10 +1118,10 @@ public class Node {
 								- chart.componentArcSize() + n.size.getWidth()
 								+ 1, n.itergraph.posLine.y);
 
-				n.sub.drawComponentsInverse(chart, new Float(p.x
+				n.sub.drawComponentsInverse(chart, new Point(p.x
 						+ n.size.getWidth() / 2 + n.altSize.getWidth() / 2,
 						n.posEnd.y), n.size);
-				n.itergraph.drawComponents(chart, new Float(p.x
+				n.itergraph.drawComponents(chart, new Point(p.x
 						+ n.size.getWidth() / 2 - n.iterSize.getWidth() / 2,
 						n.posEnd.y), n.size);
 			} else if (n.typ == NodeType.ITER) {
@@ -1222,7 +1224,7 @@ public class Node {
 								+ n.altSize.getWidth(), a.posLine.y
 								- chart.componentArcSize() / 2 + 1);
 					}
-					Float pf = new Float(p.x
+					Point pf = new Point(p.x
 							+ (n.altSize.getWidth() + a.size.getWidth()) / 2,
 							p1.y);
 					a.sub.drawComponentsInverse(chart, pf, a.size);
