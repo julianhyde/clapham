@@ -688,7 +688,7 @@ public class Grammar {
 
     public void makeOption(Graph g) {
         g.l = new Node(this, NodeType.OPT, g.l);
-        g.l.next = g.r;
+//        g.l.next = g.r;
         g.r = g.l;
     }
 
