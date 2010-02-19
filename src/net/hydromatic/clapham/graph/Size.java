@@ -76,7 +76,7 @@ public class Size {
         this.width += width;
     }
 
-    public void incHeight(float height) {
+    public void incHeight(int height) {
         this.height += height;
     }
 }

@@ -28,8 +28,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Stroke;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
 
 import net.hydromatic.clapham.chart.Chart;
 import net.hydromatic.clapham.graph.Grammar;
@@ -55,9 +53,6 @@ public class Java2DChart implements Chart {
 	public static final Color RERUN_COLOR = Color.GREEN;
 	public static final Color RERUN1_COLOR = Color.magenta; // was Fuschia
 	public static final Color N_NT_COLOR = Color.CYAN; // was PaleGreen
-
-	private final Font titleFont = Font.decode("Serif").deriveFont(0, 14f);
-	private final Color titleColor = Color.BLACK;
 
 	// Default Settings
 
@@ -118,14 +113,15 @@ public class Java2DChart implements Chart {
 
 	/** needed to make the gap between the symbol and and the font possible */
 	public int getFontHeight() {
-		return (int) (charFont.getSize2D() + symbolGapHeight);
+		g.setFont(charFont);
+		return g.getFontMetrics().getHeight();
 	}
 
 	/** where the drawing starts (X) */
-	private final int beginningYCoordinate = 40;
+	private final int beginningYCoordinate = 20;
 
 	/** where the drawing starts (Y) */
-	public final int beginningXCoordinate = 50;
+	public final int beginningXCoordinate = 35;
 
 	/** the graphics object from the EBNFForm on which the drawing takes place */
 	private final Grammar grammar;
@@ -145,13 +141,7 @@ public class Java2DChart implements Chart {
 
 	public int getStringWidth(String text) {
 		g.setFont(charFont);
-		final FontRenderContext context = g.getFontRenderContext();
-		final GlyphVector glyphVector = this.charFont.layoutGlyphVector(
-				context, text.toCharArray(), 0, text.length(), 0);
-		double width = glyphVector.getVisualBounds().getWidth();
-		// System.out.println("width of " + text + " is " + width);
-		width *= 1.35;
-		return (int) width;
+		return g.getFontMetrics().stringWidth(text);
 	}
 
 	public void drawString(String text, int x, int y) {
@@ -332,8 +322,8 @@ public class Java2DChart implements Chart {
 		}
 	}
 
-	public void drawArc(int x, int y, int width, int height,
-			int startAngleF, int arcAngle) {
+	public void drawArc(int x, int y, int width, int height, int startAngleF,
+			int arcAngle) {
 		expandBounds(x - width, y - height);
 		expandBounds(x + width, y - height);
 		expandBounds(x - width, y + height);

@@ -481,6 +481,7 @@ public class Clapham {
             symbol.graph = g;
             grammar.ruleMap.put(symbol, g);
         }
+        grammar.optimize();
         return grammar;
     }
    
