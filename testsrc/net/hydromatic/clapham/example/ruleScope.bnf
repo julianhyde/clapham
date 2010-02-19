@@ -1,0 +1,1 @@
+ruleScopeSpec ::= "scope" ACTION | "scope" id ("," id )* ";" | "scope" ACTION "scope" id ("," id )* ";"

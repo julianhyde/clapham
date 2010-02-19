@@ -1,0 +1,1 @@
+ifstat ::= LDELIM "if" "(" conditional ")" RDELIM template (INDENT? LDELIM "elseif" "(" conditional ")" RDELIM template )* (INDENT? LDELIM "else" RDELIM template )? INDENT? LDELIM "endif" RDELIM
