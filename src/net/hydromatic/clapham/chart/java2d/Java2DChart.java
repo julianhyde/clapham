@@ -260,7 +260,7 @@ public class Java2DChart implements Chart {
 		for (Symbol s : grammar.nonterminals) {
 			s.graph.graphSize = s.graph.l.calcSize(this);
 			s.graph.l.setWrapSize(this);
-			s.graph.l.calcPos(this, beginningYCoordinate);
+			s.graph.l.calcPos(this, beginningYCoordinate, false);
 			if (Grammar.TRACE) {
 				System.out.println("\n\n" + s.graph.graphSize.toString());
 			}

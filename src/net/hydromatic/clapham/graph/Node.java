@@ -344,7 +344,7 @@ public class Node {
 	/**
 	 * Calculates the horizontal position of the symbols.
 	 */
-	public void calcPos(Chart chart, int posBegin) {
+	public void calcPos(Chart chart, int posBegin, boolean inverse) {
 		Node n = this; // current node in the level
 		int realHeight = calcHeight(chart);
 		boolean samelevel = true; // next node in same level?
@@ -356,7 +356,7 @@ public class Node {
 				n.posEnd.y = n.posLine.y
 						+ (n.size.getHeight() - chart.componentGapHeight()) / 2;
 			} else if (n.typ == NodeType.EPS) {
-				int offset = n.n > 0 && n.isOptimized() ? chart
+				int offset = (inverse || (n.n > 0 && n.isOptimized())) ? chart
 						.symbolGapHeight() : 0;
 				n.posLine.y = posBegin + n.size.getHeight() / 2 + offset;
 				n.posBegin.y = posBegin;
@@ -365,16 +365,16 @@ public class Node {
 				n.posLine.y = posBegin + realHeight / 2;
 				n.posBegin.y = posBegin;
 				n.posEnd.y = posBegin + n.size.getHeight();
-				n.sub.calcPos(chart, n.posBegin.y);
+				n.sub.calcPos(chart, n.posBegin.y, inverse);
 			} else if (n.typ == NodeType.RERUN) {
 				n.posLine.y = posBegin + realHeight / 2;
 				n.posBegin.y = posBegin;
 				n.posEnd.y = posBegin + n.size.getHeight();
 				if (n.itergraph != null) {
 					n.itergraph.calcPos(chart, posBegin + n.altSize.getHeight()
-							/ 2);
+							/ 2, true);
 				}
-				n.sub.calcPos(chart, n.posBegin.y);
+				n.sub.calcPos(chart, n.posBegin.y, inverse);
 			} else if (n.typ == NodeType.ITER) {
 				if (realHeight == 0) {
 					n.posLine.y = posBegin + realHeight / 2;
@@ -387,7 +387,7 @@ public class Node {
 									.componentGapHeight()) / 2;
 					n.posEnd.y = n.posBegin.y + n.size.getHeight();
 				}
-				n.sub.calcPos(chart, n.posLine.y);
+				n.sub.calcPos(chart, n.posLine.y, true);
 			} else if (n.typ == NodeType.WRAP && firstLevel) {
 				n.posLine.y = posBegin + realHeight / 2;
 				n.posEnd.y = posBegin + n.size.getHeight();
@@ -397,9 +397,10 @@ public class Node {
 				n.posBegin.y = posBegin;
 				n.posEnd.y = posBegin + n.altSize.getHeight();
 
-				n.sub.calcPos(chart, posBegin);
+				n.sub.calcPos(chart, posBegin, inverse);
 				if (n.down != null) {
-					n.down.calcPos(chart, posBegin + n.size.getHeight());
+					n.down.calcPos(chart, posBegin + n.size.getHeight(),
+							inverse);
 				}
 			}
 			if (n.up) {
@@ -647,15 +648,22 @@ public class Node {
 					}
 					if (nnodes > 0) {
 						// nodes in sub > 1
-						subNodeWidth += chart.componentGapWidth() * 2;
+						subNodeWidth += chart.componentGapWidth() * (nnodes);
 					}
 					// center node
-					int middle = p.x + (nodeWidth - subNodeWidth) / 2;
+					int center = p.x + (nodeWidth - subNodeWidth) / 2;
+
+					int minCenter = p.x + chart.componentGapWidth() / 4
+							+ chart.componentArcSize();
+					while (center < minCenter) {
+						center += chart.componentGapWidth() / 2;
+						subNodeWidth -= chart.componentGapWidth();
+					}
 
 					// the two short lines at the beginning and the end of the
 					// first component
-					chart.drawLine(p.x, n.posLine.y, middle, n.posLine.y);
-					chart.drawLine(middle + subNodeWidth, n.posLine.y, p.x
+					chart.drawLine(p.x, n.posLine.y, center, n.posLine.y);
+					chart.drawLine(center + subNodeWidth, n.posLine.y, p.x
 							+ n.size.getWidth(), n.posLine.y);
 					// the quarter Arcs
 					chart.drawArcCorner(p.x + chart.componentGapWidth() / 4
@@ -704,7 +712,7 @@ public class Node {
 							p.x + n.size.getWidth() / 2 + n.iterSize.getWidth()
 									/ 2, n.posEnd.y), n.size);
 
-					n.sub.drawComponents(chart, new Point(middle, n.posEnd.y),
+					n.sub.drawComponents(chart, new Point(center, n.posEnd.y),
 							n.size);
 
 					p.x += n.size.getWidth();
