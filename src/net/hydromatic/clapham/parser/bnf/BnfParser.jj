@@ -34,7 +34,7 @@ import net.hydromatic.clapham.parser.*;
  * Parser for grammars in Backus-Naur Form (BNF) notation.
  *
  * <p>The supported grammar is
- * <a href="http://en.wikipedia.org/wiki/Backus–Naur_form">Backus-Naur Form</a>,
+ * <a href="http://en.wikipedia.org/wiki/Backusï¿½Naur_form">Backus-Naur Form</a>,
  * extended with '*' (closure operator), '+' (mandatory repetition), but is not
  * the grammar officially known as 'Extended Backus-Naur Form' (EBNF).
  *
@@ -183,7 +183,7 @@ EbnfNode Factor() :
     (
         <PLUS>
         {
-            n = new MandatoryRepeatNode(n);
+            n = new SequenceNode(Arrays.asList(n, new MandatoryRepeatNode(n)));
         }
     )?
     {
