@@ -57,11 +57,8 @@ public class Java2DChart implements Chart {
 	// Default Settings
 
 	/** show the rectangles around the components */
-	private static final int defaultComponentArcSize = 16;
-
 	public final boolean showBorders = false;
-	private static final int defaultComponentGapWidth = 32;
-	private static final int defaultComponentGapHeight = 10;
+
 	private static final Font defaultCharFont = Font.decode("Serif")
 			.deriveFont(Font.PLAIN, 12f);
 
@@ -75,13 +72,13 @@ public class Java2DChart implements Chart {
 	// Initialize variables with default settings
 
 	// size of the arcs
-	public int componentArcSize = defaultComponentArcSize;
+	public int componentArcSize = ARC_SIZE;
 
 	// gap between subcomponent size and actual size
-	public int componentGapWidth = defaultComponentGapWidth;
+	public int componentGapWidth = GAP_WIDTH;
 
 	// gap between subcomponent size and actual size
-	public int componentGapHeight = defaultComponentGapHeight;
+	public int componentGapHeight = GAP_HEIGHT;
 
 	// font of the t and nt symbols
 	public Font charFont = defaultCharFont;
@@ -141,7 +138,7 @@ public class Java2DChart implements Chart {
 
 	public int getStringWidth(String text) {
 		g.setFont(charFont);
-		return g.getFontMetrics().stringWidth(text);
+		return g.getFontMetrics().stringWidth(text) + symbolGapWidth * 6;
 	}
 
 	public void drawString(String text, int x, int y) {
@@ -185,10 +182,10 @@ public class Java2DChart implements Chart {
 	void setComponentGapHeight(int value) {
 		componentGapHeight = value;
 		final int fontHeight = getFontHeight();
-		if (componentGapHeight / 2 + fontHeight / 2 < defaultComponentArcSize) {
+		if (componentGapHeight / 2 + fontHeight / 2 < ARC_SIZE) {
 			componentArcSize = (componentGapHeight + fontHeight) / 2;
 		} else {
-			componentArcSize = defaultComponentArcSize;
+			componentArcSize = ARC_SIZE;
 		}
 		if (componentArcSize % 2 != 0) {
 			componentArcSize -= 1;
@@ -212,9 +209,9 @@ public class Java2DChart implements Chart {
 	}
 
 	public void restoreDefaultSettings() {
-		componentArcSize = defaultComponentArcSize;
-		componentGapWidth = defaultComponentGapWidth;
-		setComponentGapHeight(defaultComponentGapHeight);
+		componentArcSize = ARC_SIZE;
+		componentGapWidth = GAP_WIDTH;
+		setComponentGapHeight(GAP_HEIGHT);
 		charFont = defaultCharFont;
 		arrowSize = defaultArrowSize;
 		lineStroke = defaultLineStroke;
@@ -223,7 +220,9 @@ public class Java2DChart implements Chart {
 		charColor = defaultCharColor;
 	}
 
-	public void drawComponent(Symbol s) {
+	public void drawComponent(String name) {
+		Symbol s = grammar.symbolMap.get(name);
+
 		if (s == null) {
 			return;
 		}
@@ -403,12 +402,12 @@ public class Java2DChart implements Chart {
 
 	@Override
 	public int componentGapHeight() {
-		return defaultComponentGapHeight;
+		return GAP_HEIGHT;
 	}
 
 	@Override
 	public int componentGapWidth() {
-		return defaultComponentGapWidth;
+		return GAP_WIDTH;
 	}
 
 	@Override
@@ -418,11 +417,16 @@ public class Java2DChart implements Chart {
 
 	@Override
 	public int symbolGapHeight() {
-		return defaultSymbolGapHeight;
+		return symbolGapHeight;
 	}
 
 	@Override
 	public int symbolGapWidth() {
-		return defaultComponentGapWidth;
+		return symbolGapWidth;
+	}
+
+	@Override
+	public int fontHeightCorrectness() {
+		return symbolGapHeight * 3;
 	}
 }

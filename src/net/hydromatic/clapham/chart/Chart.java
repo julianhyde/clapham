@@ -1,14 +1,16 @@
 package net.hydromatic.clapham.chart;
 
 import net.hydromatic.clapham.graph.Node;
-import net.hydromatic.clapham.graph.Symbol;
 
-/**
- * 
- * @author Edgar Espina
- * 
- */
 public interface Chart {
+
+	int ARC_SIZE = 16;
+
+	int GAP_HEIGHT = 10;
+
+	int GAP_WIDTH = 32;
+
+	int ARROW_SIZE = 3;
 
 	public enum Direction {
 		LEFT, RIGHT, UP, DOWN
@@ -70,6 +72,8 @@ public interface Chart {
 
 	void calcDrawing();
 
-	void drawComponent(Symbol symbol);
+	void drawComponent(String name);
+
+	int fontHeightCorrectness();
 
 }

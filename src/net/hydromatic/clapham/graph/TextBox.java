@@ -44,10 +44,8 @@ public class TextBox {
 	}
 
 	void drawAtCenter(int x1, int y1, int width, int height) {
-		int x = x1 + width / 2;
-		x -= this.width / 2;
-		int y = y1 + height / 2;
-		y += this.height / 2;
+		int x = x1 + Math.abs(width - this.width) / 2 + chart.symbolGapWidth() * 3;
+		int y = y1 + Math.abs(height - this.height) / 2 +  + chart.fontHeightCorrectness();
 		chart.drawString(text, x, y);
 	}
 }
