@@ -356,8 +356,9 @@ public class Node {
 				n.posEnd.y = n.posLine.y
 						+ (n.size.getHeight() - chart.componentGapHeight()) / 2;
 			} else if (n.typ == NodeType.EPS) {
-				int offset = (inverse || (n.n > 0 && n.isOptimized())) ? chart
-						.symbolGapHeight() : 0;
+				int offset = ((inverse && n.up) || (n.n > 0 && n.isOptimized())) ? chart
+						.symbolGapHeight()
+						: 0;
 				n.posLine.y = posBegin + n.size.getHeight() / 2 + offset;
 				n.posBegin.y = posBegin;
 				n.posEnd.y = posBegin + n.size.getHeight();
