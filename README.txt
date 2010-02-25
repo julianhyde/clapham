@@ -1,7 +1,7 @@
 Clapham is a utility that generates railroad diagrams 
 to illustrate the syntax of computer language grammars.
 
-For license and copying information, see LICENSE.html.
+For license and copying information, see LICENSE.txt.
 
 For current version, see VERSION.txt.
 
