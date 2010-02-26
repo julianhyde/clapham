@@ -33,22 +33,22 @@ import net.hydromatic.clapham.graph.Graph;
 
 /**
  * TODO:
- * 
+ *
  * @author jhyde
  * @version $Id$
  * @since Jul 30, 2008
  */
 public interface EbnfNode {
 
-	/**
-	 * Return a {@link Graph} that represent this ebnf expression
-	 * 
-	 * @param grammar
-	 * @return A {@link Graph} that represent this ebnf expression
-	 */
-	Graph toGraph(Grammar grammar);
+    /**
+     * Returns a {@link Graph} that represent this EBNF expression.
+     *
+     * @param grammar
+     * @return A {@link Graph} that represent this EBNF expression
+     */
+    Graph toGraph(Grammar grammar);
 
-	void toString(StringBuilder buf);
+    void toString(StringBuilder buf);
 }
 
 // End EbnfNode.java

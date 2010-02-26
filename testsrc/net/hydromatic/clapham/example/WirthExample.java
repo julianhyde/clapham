@@ -73,7 +73,6 @@ public class WirthExample {
         }
 
         public void testDrawNonexistentSymbolFails() {
-
         }
     }
 }

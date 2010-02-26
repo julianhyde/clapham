@@ -39,17 +39,17 @@ package net.hydromatic.clapham.graph;
 public class Symbol {
 
     public final NodeType typ;         // t, nt
-	public final String   name;        // symbol name
-	public Graph    graph;       // nt: to first node of syntax graph
+    public final String   name;        // symbol name
+    public Graph    graph;       // nt: to first node of syntax graph
 
-	public Symbol(NodeType typ, String name) {
-		if (name.length() == 0) {
-			System.out.println("empty token not allowed");
+    public Symbol(NodeType typ, String name) {
+        if (name.length() == 0) {
+            System.out.println("empty token not allowed");
             name = "???";
-		}
-		this.typ = typ;
+        }
+        this.typ = typ;
         this.name = name;
-	}
+    }
 }
 
 // End Symbol.java

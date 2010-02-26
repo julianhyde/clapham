@@ -91,30 +91,33 @@ public class ClaphamTest extends TestCase {
         + "LITERAL    ::= <QUOT> <CHARACTER>+ <QUOT>";
 
     //    BNF (not supported yet)
-    // See http://en.wikipedia.org/wiki/Backus–Naur_Form
+    // See <a href="http://en.wikipedia.org/wiki/Backus–Naur_Form">BNF</a>
     //
     // <syntax> ::= <rule> | <rule> <syntax>
     // <rule>   ::= <opt-whitespace> "<" <rule-name> ">" <opt-whitespace> "::="
     //                 <opt-whitespace> <expression> <line-end>
-    // <opt-whitespace> ::= " " <opt-whitespace> | ""  <!-- "" is empty string, i.e. no whitespace -->
+    // <opt-whitespace> ::= " " <opt-whitespace> | ""
+    //                       <!-- "" is empty string, i.e. no whitespace -->
     // <expression>     ::= <list> | <list> "|" <expression>
     // <line-end>       ::= <opt-whitespace> <EOL> | <line-end> <line-end>
     // <list>    ::= <term> | <term> <opt-whitespace> <list>
     // <term>    ::= <literal> | "<" <rule-name> ">"
-    // <literal> ::= '"' <text> '"' | "'" <text> "'" <!-- actually, the original BNF did not use quotes -->
+    // <literal> ::= '"' <text> '"' | "'" <text> "'"
+    //                  <!-- actually, the original BNF did not use quotes -->
 
     // Augmented BNF (not supported yet)
-    // See http://en.wikipedia.org/wiki/Augmented_Backus–Naur_Form
+    // See <a href="http://en.wikipedia.org/wiki/Augmented_Backus–Naur_Form">
+    // Augmented BNF</a>
     //
     // As BNF, but:
     // rule = definition ; comment CR LF
-    
+
     public void testParse() throws ParseException {
         final WirthParser parser =
             new WirthParser(new StringReader(WIRTH_GRAMMAR));
         final List<ProductionNode> productionNodes = parser.Syntax();
         StringBuilder buf = new StringBuilder();
-        WirthParser.toString(buf,"{",productionNodes, "}");
+        WirthParser.toString(buf, "{", productionNodes, "}");
         String s = buf.toString();
         assertEquals(
             "{SYNTAX = RepeatNode(PRODUCTION), "
@@ -139,7 +142,7 @@ public class ClaphamTest extends TestCase {
             new BnfParser(new StringReader(WIRTH_GRAMMAR_BNF));
         final List<ProductionNode> productionNodes = parser.Syntax();
         StringBuilder buf = new StringBuilder();
-        WirthParser.toString(buf,"{",productionNodes, "}");
+        WirthParser.toString(buf, "{", productionNodes, "}");
         String s = buf.toString();
         assertEquals(
             "{SYNTAX = RepeatNode(PRODUCTION), "
@@ -168,7 +171,7 @@ public class ClaphamTest extends TestCase {
             new BnfParser(new FileReader("C:/open/clapham/aspen.bnf"));
         final List<ProductionNode> productionNodes = parser.Syntax();
         StringBuilder buf = new StringBuilder();
-        WirthParser.toString(buf,"{",productionNodes, "}");
+        WirthParser.toString(buf, "{", productionNodes, "}");
         String s = buf.toString();
         System.out.println(s);
         doDraw(productionNodes, "FACTOR");

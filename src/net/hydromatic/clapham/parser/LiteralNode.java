@@ -47,14 +47,14 @@ public class LiteralNode extends BaseEbnfNode {
     public LiteralNode(String s) {
         this.s = s;
     }
-    
+
     public Graph toGraph(Grammar grammar) {
-		Symbol symbol = new Symbol(NodeType.TERM, s);
-		grammar.terminals.add(symbol);
-		// grammar.symbolMap.put(symbol.name, symbol);
-		Graph graph = new Graph(new Node(grammar, symbol));
-		return graph;
-	}
+        Symbol symbol = new Symbol(NodeType.TERM, s);
+        grammar.terminals.add(symbol);
+        // grammar.symbolMap.put(symbol.name, symbol);
+        Graph graph = new Graph(new Node(grammar, symbol));
+        return graph;
+    }
 
     public void toString(StringBuilder buf) {
         buf.append('"').append(s).append('"');

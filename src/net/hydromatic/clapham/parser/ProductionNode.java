@@ -49,10 +49,10 @@ public class ProductionNode extends BaseEbnfNode {
         this.id = id;
         this.expression = expression;
     }
-    
+
     public Graph toGraph(Grammar grammar) {
-		return expression.toGraph(grammar);
-	}
+        return expression.toGraph(grammar);
+    }
 
     public void toString(StringBuilder buf) {
         id.toString(buf);

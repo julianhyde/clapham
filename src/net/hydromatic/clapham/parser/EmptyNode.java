@@ -44,11 +44,11 @@ public class EmptyNode extends BaseEbnfNode {
     }
 
     public Graph toGraph(Grammar grammar) {
-		Graph g = new Graph();
-		grammar.makeEpsilon(g);
-		return g;
-	}
-    
+        Graph g = new Graph();
+        grammar.makeEpsilon(g);
+        return g;
+    }
+
     public void toString(StringBuilder buf) {
         buf.append("EmptyNode");
     }

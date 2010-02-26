@@ -44,12 +44,12 @@ public class OptionNode extends BaseEbnfNode {
     public OptionNode(EbnfNode n) {
         this.n = n;
     }
-    
+
     public Graph toGraph(Grammar grammar) {
-		final Graph g = n.toGraph(grammar);
-		grammar.makeOption(g);
-		return g;
-	}
+        final Graph g = n.toGraph(grammar);
+        grammar.makeOption(g);
+        return g;
+    }
 
     public void toString(StringBuilder buf) {
         buf.append("OptionNode(");

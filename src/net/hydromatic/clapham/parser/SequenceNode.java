@@ -46,19 +46,19 @@ public class SequenceNode extends BaseEbnfNode {
     public SequenceNode(List<EbnfNode> list) {
         this.list = list;
     }
-    
+
     public Graph toGraph(Grammar grammar) {
-		Graph g = null;
-		for (EbnfNode node : list) {
-			if (g == null) {
-				g = node.toGraph(grammar);
-			} else {
-				Graph g2 = node.toGraph(grammar);
-				grammar.makeSequence(g, g2);
-			}
-		}
-		return g;
-	}
+        Graph g = null;
+        for (EbnfNode node : list) {
+            if (g == null) {
+                g = node.toGraph(grammar);
+            } else {
+                Graph g2 = node.toGraph(grammar);
+                grammar.makeSequence(g, g2);
+            }
+        }
+        return g;
+    }
 
     public void toString(StringBuilder buf) {
         toString(buf, "SequenceNode(", list, ")");

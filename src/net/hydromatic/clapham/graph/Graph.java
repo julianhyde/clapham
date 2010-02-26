@@ -37,8 +37,12 @@ package net.hydromatic.clapham.graph;
  */
 public class Graph {
 
-    public Node l;    // left end of graph = head
-    public Node r;    // right end of graph = list of nodes to be linked to successor graph
+    /** left end of graph = head */
+    public Node l;
+
+    /** right end of graph = list of nodes to be linked to successor graph */
+    public Node r;
+
     public Size graphSize;
 
     public Graph() {

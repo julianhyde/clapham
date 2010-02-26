@@ -33,30 +33,35 @@ import net.hydromatic.clapham.chart.Chart;
 
 /**
  * TODO:
- * 
+ *
  * @author jhyde
  * @version $Id$
  * @since Sep 1, 2008
  */
 public class TextBox {
-	private final Chart chart;
-	private final String text;
-	final int width;
-	final int height;
+    private final Chart chart;
+    private final String text;
+    final int width;
+    final int height;
 
-	TextBox(Chart chart, String text) {
-		this.chart = chart;
-		this.text = text;
-		this.width = chart.getStringWidth(text);
-		this.height = chart.getFontHeight();
+    TextBox(Chart chart, String text) {
+        this.chart = chart;
+        this.text = text;
+        this.width = chart.getStringWidth(text);
+        this.height = chart.getFontHeight();
+    }
 
-	}
-
-	void drawAtCenter(int x1, int y1, int width, int height) {
-		int x = x1 + Math.abs(width - this.width) / 2 + chart.symbolGapWidth() * 3;
-		int y = y1 + Math.abs(height - this.height) / 2 +  + chart.fontHeightCorrectness();
-		chart.drawString(text, x, y);
-	}
+    void drawAtCenter(int x1, int y1, int width, int height) {
+        int x =
+            x1
+            + Math.abs(width - this.width) / 2
+            + chart.symbolGapWidth() * 3;
+        int y =
+            y1
+            + Math.abs(height - this.height) / 2
+            +  + chart.fontHeightCorrectness();
+        chart.drawString(text, x, y);
+    }
 }
 
 // End TextBox.java

@@ -44,12 +44,12 @@ public class RepeatNode extends BaseEbnfNode {
     public RepeatNode(EbnfNode list) {
         this.node = list;
     }
-    
+
     public Graph toGraph(Grammar grammar) {
-		final Graph g = node.toGraph(grammar);
-		grammar.makeIteration(g);
-		return g;
-	}
+        final Graph g = node.toGraph(grammar);
+        grammar.makeIteration(g);
+        return g;
+    }
 
     public void toString(StringBuilder buf) {
         buf.append("RepeatNode(");

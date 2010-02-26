@@ -46,20 +46,20 @@ public class AlternateNode extends BaseEbnfNode {
     public AlternateNode(List<EbnfNode> list) {
         this.list = list;
     }
-    
+
     public Graph toGraph(Grammar grammar) {
-		Graph g = null;
-		for (EbnfNode node : list) {
-			if (g == null) {
-				g = node.toGraph(grammar);
-				grammar.makeFirstAlt(g);
-			} else {
-				Graph g2 = node.toGraph(grammar);
-				grammar.makeAlternative(g, g2);
-			}
-		}
-		return g;
-	}
+        Graph g = null;
+        for (EbnfNode node : list) {
+            if (g == null) {
+                g = node.toGraph(grammar);
+                grammar.makeFirstAlt(g);
+            } else {
+                Graph g2 = node.toGraph(grammar);
+                grammar.makeAlternative(g, g2);
+            }
+        }
+        return g;
+    }
 
     public void toString(StringBuilder buf) {
         toString(buf, "AlternateNode(", list, ")");

@@ -46,12 +46,12 @@ public class MandatoryRepeatNode extends BaseEbnfNode {
     public MandatoryRepeatNode(EbnfNode list) {
         this.node = list;
     }
-    
+
     public Graph toGraph(Grammar grammar) {
-		final Graph g = node.toGraph(grammar);
-		grammar.makeIteration(g); // TODO: make mandatory
-		return g;
-	}
+        final Graph g = node.toGraph(grammar);
+        grammar.makeIteration(g); // TODO: make mandatory
+        return g;
+    }
 
     public void toString(StringBuilder buf) {
         buf.append("MandatoryRepeatNode(");

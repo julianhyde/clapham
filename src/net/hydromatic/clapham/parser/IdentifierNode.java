@@ -49,13 +49,13 @@ public class IdentifierNode extends BaseEbnfNode {
     }
 
     public Graph toGraph(Grammar grammar) {
-		Symbol symbol = new Symbol(NodeType.NONTERM, s);
-		// grammar.symbolMap.put(symbol.name, symbol);
-		Graph graph = new Graph(new Node(grammar, symbol));
-		// graph.finish(graph);
-		return graph;
-	}
-    
+        Symbol symbol = new Symbol(NodeType.NONTERM, s);
+        // grammar.symbolMap.put(symbol.name, symbol);
+        Graph graph = new Graph(new Node(grammar, symbol));
+        // graph.finish(graph);
+        return graph;
+    }
+
     public void toString(StringBuilder buf) {
         buf.append(s);
     }
