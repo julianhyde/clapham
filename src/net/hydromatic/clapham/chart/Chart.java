@@ -46,6 +46,10 @@ public interface Chart {
 
     int ARROW_SIZE = 3;
 
+	int INITIAL_X = 35;
+
+	int INITIAL_Y = 20;
+
     public enum Direction {
         LEFT, RIGHT, UP, DOWN
     }
@@ -98,7 +102,11 @@ public interface Chart {
 
     void drawArcCorner(int x, int y, int arcSize);
 
-    int beginningXCoordinate();
+	int initialX();
+	
+	int initialY();
+	
+	void setInitialLocation(int x, int y);
 
     void drawArc(
         int x, int y, int width, int height, int startAngle, int arcAngle);

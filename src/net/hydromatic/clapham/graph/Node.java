@@ -1041,9 +1041,9 @@ public class Node {
                     // the short horizontal line at the beginning of the second
                     // component
                     chart.drawLine(
-                        chart.beginningXCoordinate(),
+                        chart.initialX(),
                         n.next.posLine.y,
-                        chart.beginningXCoordinate()
+                        chart.initialX()
                         - chart.componentGapWidth() / 4,
                         n.next.posLine.y);
                     // the quarter Arcs
@@ -1061,13 +1061,13 @@ public class Node {
                         - chart.componentArcSize(),
                         0);
                     chart.drawArcCorner(
-                        chart.beginningXCoordinate()
+                        chart.initialX()
                         - chart.componentGapWidth() / 4
                         - chart.componentArcSize() / 2,
                         n.posEnd.y,
                         180);
                     chart.drawArcCorner(
-                        chart.beginningXCoordinate()
+                        chart.initialX()
                         - chart.componentGapWidth() / 4
                         - chart.componentArcSize() / 2,
                         n.next.posLine.y
@@ -1087,12 +1087,12 @@ public class Node {
                         - chart.componentArcSize() / 2
                         + 1);
                     chart.drawLine(
-                        chart.beginningXCoordinate()
+                        chart.initialX()
                         - chart.componentGapWidth() / 4
                         - chart.componentArcSize() / 2,
                         n.posEnd.y
                         + chart.componentArcSize() / 2,
-                        chart.beginningXCoordinate()
+                        chart.initialX()
                         - chart.componentGapWidth() / 4
                         - chart.componentArcSize() / 2,
                         n.next.posLine.y
@@ -1104,11 +1104,11 @@ public class Node {
                         p.x
                         + chart.componentGapWidth() / 4 + 1,
                         n.posEnd.y,
-                        chart.beginningXCoordinate()
+                        chart.initialX()
                         - chart.componentGapWidth() / 4,
                         n.posEnd.y);
 
-                    p.x = chart.beginningXCoordinate();
+                    p.x = chart.initialX();
                 }
                 break;
             case ALT: {

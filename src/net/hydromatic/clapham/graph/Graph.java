@@ -60,8 +60,8 @@ public class Graph {
         r = p;
     }
 
-    public void finish(Graph g) {
-        Node p = g.r;
+	public void finish() {
+		Node p = r;
         while (p != null) {
             Node q = p.next;
             p.next = null;

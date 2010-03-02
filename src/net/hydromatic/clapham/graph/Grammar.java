@@ -62,6 +62,14 @@ public class Grammar {
             return p.n;
         }
     }
+    
+    /**
+     * Returns a read-only list of nodes
+     * @return A read-only list of nodes
+     */
+    public List<Node> nodes() {
+    	return Collections.unmodifiableList(nodes);
+    }
 
     public void setOptimizeGraph(boolean value) {
         this.optimizeGraph = value;
