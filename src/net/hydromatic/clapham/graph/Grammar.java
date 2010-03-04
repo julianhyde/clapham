@@ -41,8 +41,8 @@ import java.io.PrintStream;
  * @since Aug 26, 2008
  */
 public class Grammar {
-    public final Map<String, Symbol> symbolMap = new HashMap<String, Symbol>();
-    public final Map<Symbol, Graph> ruleMap = new HashMap<Symbol, Graph>();
+    public final Map<String, Symbol> symbolMap = new LinkedHashMap<String, Symbol>();
+
     final List<Node> nodes = new ArrayList<Node>();
 
     public static boolean TRACE = false;

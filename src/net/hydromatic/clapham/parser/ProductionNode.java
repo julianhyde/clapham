@@ -56,9 +56,28 @@ public class ProductionNode extends BaseEbnfNode {
 
     public void toString(StringBuilder buf) {
         id.toString(buf);
-        buf.append(" = ");
+        buf.append(" ::= ");
         expression.toString(buf);
     }
+    
+    @Override
+    public String toString() {
+    	StringBuilder buff = new StringBuilder();
+    	toString(buff);
+    	return buff.toString();
+    }
+    
+    public String toEbnf() {
+    	return toEbnf(EbnfDecorator.PLAIN_TEXT);
+    }
+    
+    public String toEbnf(EbnfDecorator decorator) {
+    	StringBuilder buff = new StringBuilder();
+    	buff.append(id.toEbnf(decorator));
+        buff.append(" ::= ");
+        buff.append(expression.toEbnf(decorator));
+		return buff.toString();
+	}
 }
 
 // End ProductionNode.java

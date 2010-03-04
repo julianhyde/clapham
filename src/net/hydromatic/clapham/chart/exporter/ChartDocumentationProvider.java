@@ -1,7 +1,6 @@
 /*
-// $Id$
 // Clapham generates railroad diagrams to represent computer language grammars.
-// Copyright (C) 2008-2009 Julian Hyde
+// Copyright (C) 2010-2010 Edgar Espina
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,38 +25,40 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
  */
-package net.hydromatic.clapham.parser;
-
-import net.hydromatic.clapham.graph.Grammar;
-import net.hydromatic.clapham.graph.Graph;
+package net.hydromatic.clapham.chart.exporter;
 
 /**
- * TODO:
  * 
- * @author jhyde
- * @version $Id$
- * @since Jul 30, 2008
+ * Just a callback interface to extend the {@link ChartHtmlExporter exporter}.
+ * This callback interface allows to insert additional documentation to generate
+ * html page.
+ * 
+ * Usage:
+ * 
+ * <pre>
+ * ChartHtmlExporter exporter = new ChartHtmlExporter()
+ * 					.withDocumentationProvider(docProvider);
+ * </pre>
+ * 
+ * @author Edgar Espina
+ * 
  */
-public class MandatoryRepeatNode extends BaseEbnfNode {
-	public final EbnfNode node;
+public interface ChartDocumentationProvider {
+    /**
+     * Returns the documentation associate to the grammar it can be null or an
+     * empty string too
+     * 
+     * @param grammarName
+     * @return
+     */
+    String grammar(String grammarName);
 
-	public MandatoryRepeatNode(EbnfNode list) {
-		this.node = list;
-	}
-
-	public Graph toGraph(Grammar grammar) {
-		final Graph g = node.toGraph(grammar);
-		grammar.makeIteration(g); // TODO: make mandatory
-		return g;
-	}
-
-	public void toString(StringBuilder buf) {
-		buf.append("MandatoryRepeatNode(");
-		node.toString(buf);
-		buf.append(")");
-	}
-
-	public String toEbnf(EbnfDecorator decorator) {
-		return toEbnf(decorator, node, "+");
-	}
+    /**
+     * Returns the documentation associate to the given rule it can be null or
+     * an empty string too
+     * 
+     * @param ruleName
+     * @return
+     */
+    String rule(String ruleName);
 }

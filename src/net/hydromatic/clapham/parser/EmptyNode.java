@@ -52,6 +52,10 @@ public class EmptyNode extends BaseEbnfNode {
     public void toString(StringBuilder buf) {
         buf.append("EmptyNode");
     }
+    
+    public String toEbnf(EbnfDecorator decorator) {
+    	return "";
+    }
 }
 
 // End EmptyNode.java

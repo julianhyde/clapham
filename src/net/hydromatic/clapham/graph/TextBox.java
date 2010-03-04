@@ -47,15 +47,15 @@ public class TextBox {
     TextBox(Chart chart, String text) {
         this.chart = chart;
         this.text = text;
-        this.width = chart.getStringWidth(text);
-        this.height = chart.getFontHeight();
+        this.width = chart.getOptions().stringWidth(text);
+        this.height = chart.getOptions().fontHeight();
     }
 
     void drawAtCenter(int x1, int y1, int width, int height) {
         int x =
             x1
             + Math.abs(width - this.width) / 2
-            + chart.symbolGapWidth() * 3;
+            + chart.getOptions().symbolGapWidth() * 3;
         int y =
             y1
             + Math.abs(height - this.height) / 2

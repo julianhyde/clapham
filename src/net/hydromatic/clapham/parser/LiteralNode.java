@@ -59,6 +59,10 @@ public class LiteralNode extends BaseEbnfNode {
     public void toString(StringBuilder buf) {
         buf.append('"').append(s).append('"');
     }
+    
+    public String toEbnf(EbnfDecorator decorator) {
+    	return decorator.beginTerminal() + s + decorator.endTerminal();
+    }
 }
 
 // End LiteralNode.java

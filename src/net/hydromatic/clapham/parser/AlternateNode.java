@@ -64,6 +64,18 @@ public class AlternateNode extends BaseEbnfNode {
     public void toString(StringBuilder buf) {
         toString(buf, "AlternateNode(", list, ")");
     }
+    
+    public String toEbnf(EbnfDecorator decorator) {
+    	StringBuilder buff = new StringBuilder();
+    	final String SEPARATOR = " | ";
+    	for(EbnfNode n: list) {
+    		buff.append(n.toEbnf(decorator)).append(SEPARATOR);
+    	}
+    	if(buff.length() > 0) {
+    		buff.setLength(buff.length() - SEPARATOR.length());
+    	}
+    	return buff.toString();
+    }
 }
 
 // End AlternateNode.java

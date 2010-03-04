@@ -56,6 +56,10 @@ public class RepeatNode extends BaseEbnfNode {
         node.toString(buf);
         buf.append(")");
     }
+    
+    public String toEbnf(EbnfDecorator decorator) {
+    	return toEbnf(decorator, node, "*");
+	}
 }
 
 // End RepeatNode.java

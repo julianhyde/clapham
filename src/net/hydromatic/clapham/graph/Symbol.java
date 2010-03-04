@@ -29,6 +29,8 @@
 */
 package net.hydromatic.clapham.graph;
 
+import net.hydromatic.clapham.parser.ProductionNode;
+
 /**
  * TODO:
  *
@@ -41,6 +43,8 @@ public class Symbol {
     public final NodeType typ;         // t, nt
     public final String   name;        // symbol name
     public Graph    graph;       // nt: to first node of syntax graph
+    /**The production that generate this symbol*/
+    private ProductionNode production;
 
     public Symbol(NodeType typ, String name) {
         if (name.length() == 0) {
@@ -50,6 +54,15 @@ public class Symbol {
         this.typ = typ;
         this.name = name;
     }
+        
+    public ProductionNode getProduction() {
+		return production;
+	}
+    
+    public Symbol withProduction(ProductionNode production) {
+		this.production = production;
+		return this;
+	}
 }
 
 // End Symbol.java

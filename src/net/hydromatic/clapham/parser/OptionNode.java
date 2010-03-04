@@ -25,7 +25,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 package net.hydromatic.clapham.parser;
 
 import net.hydromatic.clapham.graph.Grammar;
@@ -33,28 +33,32 @@ import net.hydromatic.clapham.graph.Graph;
 
 /**
  * TODO:
-*
-* @author jhyde
-* @version $Id$
-* @since Jul 30, 2008
-*/
+ * 
+ * @author jhyde
+ * @version $Id$
+ * @since Jul 30, 2008
+ */
 public class OptionNode extends BaseEbnfNode {
     public final EbnfNode n;
 
     public OptionNode(EbnfNode n) {
-        this.n = n;
+	this.n = n;
     }
 
     public Graph toGraph(Grammar grammar) {
-        final Graph g = n.toGraph(grammar);
-        grammar.makeOption(g);
-        return g;
+	final Graph g = n.toGraph(grammar);
+	grammar.makeOption(g);
+	return g;
     }
 
     public void toString(StringBuilder buf) {
-        buf.append("OptionNode(");
-        n.toString(buf);
-        buf.append(")");
+	buf.append("OptionNode(");
+	n.toString(buf);
+	buf.append(")");
+    }
+
+    public String toEbnf(EbnfDecorator decorator) {
+	return toEbnf(decorator, n, "?");
     }
 }
 

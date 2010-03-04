@@ -1,7 +1,7 @@
 /*
-// $Id$
+// $Id: Grammar.java 20 2010-02-25 21:12:52Z jhyde $
 // Clapham generates railroad diagrams to represent computer language grammars.
-// Copyright (C) 2008-2009 Julian Hyde
+// Copyright (C) 2010-2010 Edgar Espina
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,38 +26,61 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
  */
+
 package net.hydromatic.clapham.parser;
 
-import net.hydromatic.clapham.graph.Grammar;
-import net.hydromatic.clapham.graph.Graph;
-
 /**
- * TODO:
  * 
- * @author jhyde
- * @version $Id$
- * @since Jul 30, 2008
+ * A simple decorator used by {@link ProductionNode#toEbnf(EbnfDecorator)}
+ * 
+ * @author Edgar Espina
+ * 
  */
-public class MandatoryRepeatNode extends BaseEbnfNode {
-	public final EbnfNode node;
+public interface EbnfDecorator {
 
-	public MandatoryRepeatNode(EbnfNode list) {
-		this.node = list;
-	}
+	EbnfDecorator PLAIN_TEXT = new EbnfDecorator() {
 
-	public Graph toGraph(Grammar grammar) {
-		final Graph g = node.toGraph(grammar);
-		grammar.makeIteration(g); // TODO: make mandatory
-		return g;
-	}
+		public String endTerminal() {
+			return "";
+		}
 
-	public void toString(StringBuilder buf) {
-		buf.append("MandatoryRepeatNode(");
-		node.toString(buf);
-		buf.append(")");
-	}
+		public String endNonterminal() {
+			return "";
+		}
 
-	public String toEbnf(EbnfDecorator decorator) {
-		return toEbnf(decorator, node, "+");
-	}
+		public String beginTerminal() {
+			return "";
+		}
+
+		public String beginNonterminal() {
+			return "";
+		}
+	};
+
+	EbnfDecorator HTML = new EbnfDecorator() {
+
+		public String endTerminal() {
+			return "</span>";
+		}
+
+		public String endNonterminal() {
+			return "</span>";
+		}
+
+		public String beginTerminal() {
+			return "<span class=\"terminal\">";
+		}
+
+		public String beginNonterminal() {
+			return "<span class=\"nonterminal\">";
+		}
+	};
+
+	String beginTerminal();
+
+	String endTerminal();
+
+	String beginNonterminal();
+
+	String endNonterminal();
 }

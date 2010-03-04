@@ -25,35 +25,42 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 package net.hydromatic.clapham.parser;
 
 import java.util.List;
 
 /**
  * A base class for {@link EbnfNode}.
- *
+ * 
  * @author Edgar Espina
  * @version $Id: Grammar.java 20 2010-02-25 21:12:52Z jhyde $
  */
 public abstract class BaseEbnfNode implements EbnfNode {
 
-    public <E extends EbnfNode> void toString(
-        StringBuilder buf,
-        String start,
-        List<E> list,
-        String end)
-    {
-        int i = 0;
-        buf.append(start);
-        for (E node : list) {
-            if (i++ > 0) {
-                buf.append(", ");
-            }
-            node.toString(buf);
-        }
-        buf.append(end);
-    }
+	public <E extends EbnfNode> void toString(StringBuilder buf, String start,
+			List<E> list, String end) {
+		int i = 0;
+		buf.append(start);
+		for (E node : list) {
+			if (i++ > 0) {
+				buf.append(", ");
+			}
+			node.toString(buf);
+		}
+		buf.append(end);
+	}
+
+	protected String toEbnf(EbnfDecorator decorator, EbnfNode node, String operator) {
+		StringBuilder buff = new StringBuilder();
+		boolean parenthesis = node instanceof SequenceNode;
+		buff.append(node.toEbnf(decorator));
+		if (parenthesis) {
+			buff.insert(0, "(").append(")");
+		}
+		buff.append(operator).append(" ");
+		return buff.toString();
+	}
 }
 
 // End BaseEbnfNode.java

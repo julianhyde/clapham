@@ -1,7 +1,6 @@
 /*
-// $Id$
 // Clapham generates railroad diagrams to represent computer language grammars.
-// Copyright (C) 2008-2009 Julian Hyde
+// Copyright (C) 2010-2010 Edgar Espina
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,38 +25,24 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
  */
-package net.hydromatic.clapham.parser;
+package net.hydromatic.clapham.chart;
 
-import net.hydromatic.clapham.graph.Grammar;
-import net.hydromatic.clapham.graph.Graph;
+public interface MutableChartOptions extends ChartOptions {
+    /**
+     * Set the component gap height
+     * 
+     * @param height
+     * @return
+     */
+    MutableChartOptions withComponentGapHeight(int height);
 
-/**
- * TODO:
- * 
- * @author jhyde
- * @version $Id$
- * @since Jul 30, 2008
- */
-public class MandatoryRepeatNode extends BaseEbnfNode {
-	public final EbnfNode node;
+    /**
+     * Set the arc size
+     * 
+     * @param size
+     * @return
+     */
+    MutableChartOptions withArcSize(int size);
 
-	public MandatoryRepeatNode(EbnfNode list) {
-		this.node = list;
-	}
-
-	public Graph toGraph(Grammar grammar) {
-		final Graph g = node.toGraph(grammar);
-		grammar.makeIteration(g); // TODO: make mandatory
-		return g;
-	}
-
-	public void toString(StringBuilder buf) {
-		buf.append("MandatoryRepeatNode(");
-		node.toString(buf);
-		buf.append(")");
-	}
-
-	public String toEbnf(EbnfDecorator decorator) {
-		return toEbnf(decorator, node, "+");
-	}
+    MutableChartOptions withOptimize(boolean optimize);
 }

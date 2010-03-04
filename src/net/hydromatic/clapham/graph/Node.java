@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.hydromatic.clapham.chart.Chart;
+import net.hydromatic.clapham.chart.ChartOptions;
 
 /**
  * TODO:
@@ -162,7 +163,7 @@ public class Node {
     }
 
     // calculates the size if there are wraps in the rule
-    public void setWrapSize(Chart chart) {
+    public void setWrapSize(ChartOptions options) {
         Node n = this;
         int maxH = 0;
         while (n != null) {
@@ -174,11 +175,11 @@ public class Node {
                 break;
             case ITER:
                 if (maxH < n.size.getHeight()
-                        + (chart.getFontHeight() + chart.componentGapHeight())
+                        + (options.fontHeight() + options.componentGapHeight())
                         / 2)
                 {
                     maxH = n.size.getHeight()
-                            + (chart.getFontHeight() + chart
+                            + (options.fontHeight() + options
                                     .componentGapHeight()) / 2;
                 }
                 break;
@@ -199,24 +200,23 @@ public class Node {
     /**
      * Calculates the size of each symbol.
      */
-    public Size calcSize(Chart chart) {
+    public Size calcSize(ChartOptions options) {
         Node n = this; // current node in the level
         Size s = new Size(); // alt,iter,opt: size of current construct
         int iterCompensation = 0;
         boolean samelevel = true; // next node in same level?
-        int realHeight = n.calcHeight(chart);
+        int realHeight = n.calcHeight(options);
         Size maxTotalSize = new Size(0, 0);
         while (n != null && samelevel) {
             switch (n.typ) {
             case TERM:
             case NONTERM:
-                n.textBox = new TextBox(chart, n.sym.name);
                 n.size.setHeight(
-                    n.textBox.height + chart.symbolGapHeight() * 2
-                    + chart.componentGapHeight());
-                n.size.setWidth(n.textBox.width + chart.symbolGapWidth() * 2);
+                    options.fontHeight() + options.symbolGapHeight() * 2
+                    + options.componentGapHeight());
+                n.size.setWidth(options.stringWidth(n.sym.name) + options.symbolGapWidth() * 2);
                 if (n.typ == NodeType.TERM) {
-                    n.size.maxWidth(chart.componentArcSize());
+                    n.size.maxWidth(options.arcSize());
                 }
                 if (!n.up && n.next != null && n.next.typ == NodeType.WRAP
                         && n.next.size.getHeight() == 0)
@@ -226,7 +226,7 @@ public class Node {
                             && (n.next.next.typ == NodeType.TERM
                                 || n.next.next.typ == NodeType.NONTERM))
                     {
-                        s.incWidth(chart.componentGapWidth() / 2);
+                        s.incWidth(options.componentGapWidth() / 2);
                     }
                 }
                 if (!n.up
@@ -234,54 +234,54 @@ public class Node {
                         && (n.next.typ == NodeType.TERM
                             || n.next.typ == NodeType.NONTERM))
                 {
-                    s.incWidth(chart.componentGapWidth() / 2);
+                    s.incWidth(options.componentGapWidth() / 2);
                 }
                 break;
             case EPS:
                 n.size.setHeight(
-                    chart.getFontHeight()
-                    + chart.componentGapHeight());
-                n.size.setWidth(chart.componentGapWidth());
+                    options.fontHeight()
+                    + options.componentGapHeight());
+                n.size.setWidth(options.componentGapWidth());
                 break;
             case OPT:
-                n.size = n.sub.calcSize(chart);
-                n.size.incWidth(chart.componentGapWidth() * 2);
+                n.size = n.sub.calcSize(options);
+                n.size.incWidth(options.componentGapWidth() * 2);
                 n.size.incHeight(
-                    chart.componentGapHeight() / 2
-                    + chart.componentGapHeight());
+                    options.componentGapHeight() / 2
+                    + options.componentGapHeight());
                 break;
             case ITER:
-                n.size = n.sub.calcSize(chart);
-                n.size.incWidth(chart.componentGapWidth() * 2);
+                n.size = n.sub.calcSize(options);
+                n.size.incWidth(options.componentGapWidth() * 2);
                 break;
             case WRAP:
                 maxTotalSize.incHeight(
                     s.getHeight()
-                    - chart.componentGapHeight() / 2);
+                    - options.componentGapHeight() / 2);
                 maxTotalSize.maxWidth(s.getWidth());
                 s.setHeight(0);
                 s.setWidth(0);
                 break;
             case RERUN:
-                n.size = n.sub.calcSize(chart);
+                n.size = n.sub.calcSize(options);
                 if (n.itergraph != null) {
                     n.altSize = n.size;
-                    n.iterSize = n.itergraph.calcSize(chart);
+                    n.iterSize = n.itergraph.calcSize(options);
                     n.size.maxWidth(n.iterSize.getWidth());
                     n.size.incHeight(
-                        chart.getFontHeight() * 3 / 2
-                        + chart.componentGapHeight());
+                        options.fontHeight() * 3 / 2
+                        + options.componentGapHeight());
                 } else {
-                    n.size.incHeight(chart.componentGapHeight() / 2);
+                    n.size.incHeight(options.componentGapHeight() / 2);
                 }
-                n.size.incWidth(chart.componentGapWidth() * 2);
+                n.size.incWidth(options.componentGapWidth() * 2);
                 break;
             case ALT: {
                 Node a = n;
-                int maxH = -chart.componentGapHeight();
+                int maxH = -options.componentGapHeight();
                 int maxW = 0;
                 while (a != null) {
-                    a.size = a.sub.calcSize(chart);
+                    a.size = a.sub.calcSize(options);
                     maxH += a.size.getHeight();
                     if (a.size.getWidth() > maxW) {
                         maxW = a.size.getWidth();
@@ -290,11 +290,11 @@ public class Node {
                 }
                 if (n.sub.typ == NodeType.ITER && realHeight != 0) {
                     maxH +=
-                        (chart.getFontHeight() + chart.componentGapHeight())
+                        (options.fontHeight() + options.componentGapHeight())
                         / 2;
                 }
-                maxW += 2 * chart.componentGapWidth();
-                maxH += chart.componentGapHeight();
+                maxW += 2 * options.componentGapWidth();
+                maxH += options.componentGapHeight();
 
                 n.altSize.setHeight(maxH);
                 n.altSize.setWidth(maxW);
@@ -302,7 +302,7 @@ public class Node {
                 break;
             }
             if (n.typ == NodeType.ITER && realHeight != 0) {
-                iterCompensation = (chart.getFontHeight() + chart
+                iterCompensation = (options.fontHeight() + options
                         .componentGapHeight()) / 2;
             }
             if (n.typ == NodeType.ALT) {
@@ -322,7 +322,7 @@ public class Node {
         }
         if (maxTotalSize.getWidth() != 0) {
             maxTotalSize.incHeight(
-                s.getHeight() - chart.componentGapHeight()
+                s.getHeight() - options.componentGapHeight()
                 / 2);
             maxTotalSize.maxWidth(s.getWidth());
             return maxTotalSize;
@@ -335,7 +335,7 @@ public class Node {
      * Calculates the total height of all symbols wich are in the same
      * horizontal level.
      */
-    int calcHeight(Chart chart) {
+    int calcHeight(ChartOptions options) {
         Node n = this; // current node in the level
         int realHeight = 0;
         boolean samelevel = true; // next node in same level?
@@ -344,18 +344,18 @@ public class Node {
             if (n.typ == NodeType.NONTERM || n.typ == NodeType.TERM) {
                 tmpHeight = n.size.getHeight();
             } else if (n.typ == NodeType.ITER) {
-                tmpHeight = n.sub.calcHeight(chart);
+                tmpHeight = n.sub.calcHeight(options);
             } else if (n.typ == NodeType.OPT) {
-                tmpHeight = n.sub.calcHeight(chart);
+                tmpHeight = n.sub.calcHeight(options);
             } else if (n.typ == NodeType.RERUN) {
-                tmpHeight = n.sub.calcHeight(chart);
+                tmpHeight = n.sub.calcHeight(options);
             } else if (n.typ == NodeType.ALT) {
-                tmpHeight = n.sub.calcHeight(chart);
+                tmpHeight = n.sub.calcHeight(options);
             } else if (n.typ == NodeType.EPS) {
-                tmpHeight = chart.getFontHeight() * 3 / 2;
+                tmpHeight = options.fontHeight() * 3 / 2;
                 if (realHeight < tmpHeight) {
-                    tmpHeight = chart.getFontHeight()
-                            + chart.componentGapHeight();
+                    tmpHeight = options.fontHeight()
+                            + options.componentGapHeight();
                 } else {
                     tmpHeight = 0;
                 }
@@ -372,21 +372,21 @@ public class Node {
     /**
      * Calculates the horizontal position of the symbols.
      */
-    public void calcPos(Chart chart, int posBegin, boolean inverse) {
+    public void calcPos(ChartOptions options, int posBegin, boolean inverse) {
         Node n = this; // current node in the level
-        int realHeight = calcHeight(chart);
+        int realHeight = calcHeight(options);
         boolean samelevel = true; // next node in same level?
         while (n != null && samelevel) {
             if (n.typ == NodeType.NONTERM || n.typ == NodeType.TERM) {
                 n.posLine.y = posBegin + realHeight / 2;
                 n.posBegin.y = n.posLine.y
-                        - (n.size.getHeight() - chart.componentGapHeight()) / 2;
+                        - (n.size.getHeight() - options.componentGapHeight()) / 2;
                 n.posEnd.y = n.posLine.y
-                        + (n.size.getHeight() - chart.componentGapHeight()) / 2;
+                        + (n.size.getHeight() - options.componentGapHeight()) / 2;
             } else if (n.typ == NodeType.EPS) {
                 int offset =
                     ((inverse && n.up) || (n.n > 0 && n.isOptimized()))
-                    ? chart.symbolGapHeight()
+                    ? options.symbolGapHeight()
                     : 0;
                 n.posLine.y = posBegin + n.size.getHeight() / 2 + offset;
                 n.posBegin.y = posBegin;
@@ -395,18 +395,18 @@ public class Node {
                 n.posLine.y = posBegin + realHeight / 2;
                 n.posBegin.y = posBegin;
                 n.posEnd.y = posBegin + n.size.getHeight();
-                n.sub.calcPos(chart, n.posBegin.y, inverse);
+                n.sub.calcPos(options, n.posBegin.y, inverse);
             } else if (n.typ == NodeType.RERUN) {
                 n.posLine.y = posBegin + realHeight / 2;
                 n.posBegin.y = posBegin;
                 n.posEnd.y = posBegin + n.size.getHeight();
                 if (n.itergraph != null) {
                     n.itergraph.calcPos(
-                        chart,
+                        options,
                         posBegin + n.altSize.getHeight() / 2,
                         true);
                 }
-                n.sub.calcPos(chart, n.posBegin.y, inverse);
+                n.sub.calcPos(options, n.posBegin.y, inverse);
             } else if (n.typ == NodeType.ITER) {
                 if (realHeight == 0) {
                     n.posLine.y = posBegin + realHeight / 2;
@@ -415,11 +415,11 @@ public class Node {
                 } else {
                     n.posLine.y = posBegin + realHeight / 2;
                     n.posBegin.y = posBegin
-                            + (chart.getFontHeight() + chart
+                            + (options.fontHeight() + options
                                     .componentGapHeight()) / 2;
                     n.posEnd.y = n.posBegin.y + n.size.getHeight();
                 }
-                n.sub.calcPos(chart, n.posLine.y, true);
+                n.sub.calcPos(options, n.posLine.y, true);
             } else if (n.typ == NodeType.WRAP && firstLevel) {
                 n.posLine.y = posBegin + realHeight / 2;
                 n.posEnd.y = posBegin + n.size.getHeight();
@@ -429,10 +429,10 @@ public class Node {
                 n.posBegin.y = posBegin;
                 n.posEnd.y = posBegin + n.altSize.getHeight();
 
-                n.sub.calcPos(chart, posBegin, inverse);
+                n.sub.calcPos(options, posBegin, inverse);
                 if (n.down != null) {
                     n.down.calcPos(
-                        chart,
+                        options,
                         posBegin + n.size.getHeight(),
                         inverse);
                 }
@@ -455,21 +455,23 @@ public class Node {
         Node n = this; // current node in the level
         boolean samelevel = true; // next node in same level?
 
+        ChartOptions options = chart.getOptions();
         while (n != null && samelevel) {
             switch (n.typ) {
             case TERM:
             case NONTERM:
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y
-                        - chart.componentGapHeight() / 2,
+                        - options.componentGapHeight() / 2,
                         n.size.getWidth(),
                         n.size.getHeight());
                 }
+                n.textBox = new TextBox(chart, n.sym.name);
                 if (n.typ == NodeType.TERM) {
                     // the quarter Arcs
-                    final int arcSize = (n.size.getHeight() - chart
+                    final int arcSize = (n.size.getHeight() - options
                             .componentGapHeight()) / 2;
                     chart.drawArcCorner(p.x, n.posBegin.y, arcSize, 180);
                     chart.drawArcCorner(p.x, n.posLine.y, arcSize, 90);
@@ -483,12 +485,12 @@ public class Node {
                     n.textBox.drawAtCenter(
                         p.x, n.posBegin.y,
                         n.size.getWidth() - arcSize,
-                        n.size.getHeight() - chart.componentGapHeight());
+                        n.size.getHeight() - options.componentGapHeight());
 
                     // the short vertical and horizontal lines between the
                     // quarter Arcs
                     final int quarterHeight =
-                        (n.size.getHeight() - chart.componentGapHeight()) / 4;
+                        (n.size.getHeight() - options.componentGapHeight()) / 4;
                     chart.drawLine(
                         p.x + quarterHeight - 1,
                         n.posBegin.y,
@@ -516,28 +518,28 @@ public class Node {
                         n.posBegin.x,
                         n.posBegin.y,
                         n.size.getWidth(),
-                        n.size.getHeight() - chart.componentGapHeight());
+                        n.size.getHeight() - options.componentGapHeight());
 
                     n.textBox.drawAtCenter(
                         n.posBegin.x,
                         n.posBegin.y,
                         n.size.getWidth(),
-                        n.size.getHeight() - chart.componentGapHeight());
+                        n.size.getHeight() - options.componentGapHeight());
                 }
                 if (Grammar.TRACE) {
                     System.out.println("text=" + n.sym.name);
                     System.out.println("n.posBegin.y=" + n.posBegin.y);
                     System.out.println(
-                        "chart.getFontHeight()=" + chart.getFontHeight());
+                        "chart.getFontHeight()=" + options.fontHeight());
                     System.out.println("n.size=" + n.size.getHeight());
                     System.out.println(
                         "2="
-                        + (n.size.getHeight() - chart.componentGapHeight()));
+                        + (n.size.getHeight() - options.componentGapHeight()));
                     System.out.println(
                         "3="
                         + (n.size.getHeight()
-                           - chart.componentGapHeight()
-                           - chart.getFontHeight()) / 2);
+                           - options.componentGapHeight()
+                           - options.fontHeight()) / 2);
                 }
                 chart.drawArrow(
                     p.x,
@@ -555,10 +557,10 @@ public class Node {
                     chart.drawArrow(
                         p.x,
                         n.posLine.y,
-                        p.x + chart.componentGapWidth() / 2,
+                        p.x + options.componentGapWidth() / 2,
                         n.posLine.y,
                         Chart.Direction.RIGHT);
-                    p.x += chart.componentGapWidth() / 2;
+                    p.x += options.componentGapWidth() / 2;
                 }
                 if (!n.up
                     && n.next != null
@@ -568,14 +570,14 @@ public class Node {
                     chart.drawArrow(
                         p.x,
                         n.posLine.y,
-                        p.x + chart.componentGapWidth() / 2,
+                        p.x + options.componentGapWidth() / 2,
                         n.posLine.y,
                         Chart.Direction.RIGHT);
-                    p.x += chart.componentGapWidth() / 2;
+                    p.x += options.componentGapWidth() / 2;
                 }
                 break;
             case EPS:
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -590,7 +592,7 @@ public class Node {
                     n.posLine.y);
                 break;
             case OPT:
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -602,93 +604,93 @@ public class Node {
                 chart.drawLine(
                     p.x,
                     n.posLine.y,
-                    p.x + chart.componentGapWidth(),
+                    p.x + options.componentGapWidth(),
                     n.posLine.y);
                 chart.drawLine(
                     p.x + n.size.getWidth(),
                     n.posLine.y,
-                    p.x + n.size.getWidth() - chart.componentGapWidth(),
+                    p.x + n.size.getWidth() - options.componentGapWidth(),
                     n.posLine.y);
                 // the quarter Arcs
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    - options.arcSize() / 2,
                     n.posLine.y,
                     270);
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posEnd.y
-                    - chart.componentArcSize()
-                    - chart.componentGapHeight() / 2,
+                    - options.arcSize()
+                    - options.componentGapHeight() / 2,
                     90);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.posLine.y,
                     180);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() * 3 / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() * 3 / 2
                     + n.size.getWidth(),
                     n.posEnd.y
-                    - chart.componentArcSize()
-                    - chart.componentGapHeight() / 2,
+                    - options.arcSize()
+                    - options.componentGapHeight() / 2,
                     0);
                 // the short vertical lines between the quarter Arcs
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posEnd.y
-                    - chart.componentArcSize() / 2
-                    - chart.componentGapHeight() / 2 + 1);
+                    - options.arcSize() / 2
+                    - options.componentGapHeight() / 2 + 1);
                 chart.drawLine(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2 + n.size.getWidth(),
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2 + n.size.getWidth(),
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.posEnd.y
-                    - chart.componentArcSize() / 2
-                    - chart.componentGapHeight() / 2 + 1);
+                    - options.arcSize() / 2
+                    - options.componentGapHeight() / 2 + 1);
                 // the the long horizontal line between the quarter Arcs
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize(),
+                    + options.componentGapWidth() / 4
+                    + options.arcSize(),
                     n.posEnd.y
-                    - chart.componentGapHeight() / 2,
+                    - options.componentGapHeight() / 2,
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize()
+                    - options.componentGapWidth() / 4
+                    - options.arcSize()
                     + n.size.getWidth()
                     + 1,
-                    n.posEnd.y - chart.componentGapHeight() / 2);
+                    n.posEnd.y - options.componentGapHeight() / 2);
 
                 n.sub.drawComponents(
                     chart,
-                    new Point(p.x + chart.componentGapWidth(), 0),
+                    new Point(p.x + options.componentGapWidth(), 0),
                     n.size);
                 p.x += n.size.getWidth();
                 break;
             case RERUN:
                 if (n.itergraph == null) {
-                    if (chart.showBorders()) {
+                    if (options.showBorders()) {
                         chart.drawRectangle(
                             p.x,
                             n.posBegin.y,
@@ -700,94 +702,94 @@ public class Node {
                     chart.drawLine(
                         p.x,
                         n.posLine.y,
-                        p.x + chart.componentGapWidth(),
+                        p.x + options.componentGapWidth(),
                         n.posLine.y);
                     chart.drawLine(
                         p.x
                         + n.size.getWidth(),
                         n.posLine.y,
                         p.x
-                        + n.size.getWidth() - chart.componentGapWidth(),
+                        + n.size.getWidth() - options.componentGapWidth(),
                         n.posLine.y);
                     // the quarter Arcs
                     chart.drawArcCorner(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
                         n.posEnd.y
-                        - chart.componentGapHeight() / 2
-                        - chart.componentArcSize(),
+                        - options.componentGapHeight() / 2
+                        - options.arcSize(),
                         90);
                     chart.drawArcCorner(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
                         n.posLine.y,
                         180);
                     chart.drawArcCorner(
                         p.x
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() * 3 / 2
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() * 3 / 2
                         + n.size.getWidth(),
                         n.posEnd.y
-                        - chart.componentGapHeight() / 2
-                        - chart.componentArcSize(),
+                        - options.componentGapHeight() / 2
+                        - options.arcSize(),
                         0);
                     chart.drawArcCorner(
                         p.x
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() * 3 / 2
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() * 3 / 2
                         + n.size.getWidth(),
                         n.posLine.y,
                         270);
                     // the short vertical lines between the quarter Arcs
                     chart.drawLine(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
                         n.posLine.y
-                        + chart.componentArcSize() / 2,
+                        + options.arcSize() / 2,
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
                         n.posEnd.y
-                        - chart.componentGapHeight() / 2
-                        - chart.componentArcSize() / 2 + 1);
+                        - options.componentGapHeight() / 2
+                        - options.arcSize() / 2 + 1);
                     chart.drawLine(
                         p.x
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() / 2
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2
                         + n.size.getWidth(),
                         n.posLine.y
-                        + chart.componentArcSize() / 2,
+                        + options.arcSize() / 2,
                         p.x
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() / 2
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2
                         + n.size.getWidth(),
                         n.posEnd.y
-                        - chart.componentGapHeight() / 2
-                        - chart.componentArcSize() / 2 + 1);
+                        - options.componentGapHeight() / 2
+                        - options.arcSize() / 2 + 1);
                     // the the long horizontal line between the quarter Arcs
                     chart.drawLine(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() - 1,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() - 1,
                         n.posEnd.y
-                        - chart.componentGapHeight() / 2,
+                        - options.componentGapHeight() / 2,
                         p.x
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize()
+                        - options.componentGapWidth() / 4
+                        - options.arcSize()
                         + n.size.getWidth()
                         + 1,
-                        n.posEnd.y - chart.componentGapHeight() / 2);
+                        n.posEnd.y - options.componentGapHeight() / 2);
 
                     n.sub.drawComponents(
                         chart,
-                        new Point(p.x + chart.componentGapWidth(), 0),
+                        new Point(p.x + options.componentGapWidth(), 0),
                         n.size);
                     p.x += n.size.getWidth();
                 } else {
-                    if (chart.showBorders()) {
+                    if (options.showBorders()) {
                         chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -810,16 +812,16 @@ public class Node {
                     }
                     if (nnodes > 0) {
                         // nodes in sub > 1
-                        subNodeWidth += chart.componentGapWidth() * (nnodes);
+                        subNodeWidth += options.componentGapWidth() * (nnodes);
                     }
                     // center node
                     int center = p.x + (nodeWidth - subNodeWidth) / 2;
 
-                    int minCenter = p.x + chart.componentGapWidth() / 4
-                            + chart.componentArcSize();
+                    int minCenter = p.x + options.componentGapWidth() / 4
+                            + options.arcSize();
                     while (center < minCenter) {
-                        center += chart.componentGapWidth() / 2;
-                        subNodeWidth -= chart.componentGapWidth();
+                        center += options.componentGapWidth() / 2;
+                        subNodeWidth -= options.componentGapWidth();
                     }
 
                     // the two short lines at the beginning and the end of the
@@ -833,65 +835,65 @@ public class Node {
                     // the quarter Arcs
                     chart.drawArcCorner(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
                         n.itergraph.posLine.y
-                        - chart.componentArcSize(),
+                        - options.arcSize(),
                         90);
                     chart.drawArcCorner(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
                         n.posLine.y,
                         180);
                     chart.drawArcCorner(
                         p.x
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() * 3 / 2
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() * 3 / 2
                         + n.size.getWidth(),
                         n.itergraph.posLine.y
-                        - chart.componentArcSize(),
+                        - options.arcSize(),
                         0);
                     chart.drawArcCorner(
                         p.x
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() * 3 / 2
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() * 3 / 2
                         + n.size.getWidth(),
                         n.posLine.y,
                         270);
                     // the short vertical lines between the quarter Arcs
                     chart.drawLine(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
                         n.posLine.y
-                        + chart.componentArcSize() / 2,
+                        + options.arcSize() / 2,
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
                         n.itergraph.posLine.y
-                        - chart.componentArcSize() / 2
+                        - options.arcSize() / 2
                         + 1);
                     chart.drawLine(
                         p.x
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() / 2
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2
                         + n.size.getWidth(),
                         n.posLine.y
-                        + chart.componentArcSize() / 2,
+                        + options.arcSize() / 2,
                         p.x
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() / 2
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2
                         + n.size.getWidth(),
                         n.itergraph.posLine.y
-                        - chart.componentArcSize() / 2
+                        - options.arcSize() / 2
                         + 1);
                     // the two short lines at the beginning and the end of the
                     // second component
                     chart.drawLine(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize(),
+                        + options.componentGapWidth() / 4
+                        + options.arcSize(),
                         n.itergraph.posLine.y,
                         p.x
                         + n.size.getWidth() / 2
@@ -905,8 +907,8 @@ public class Node {
                         + 1,
                         n.itergraph.posLine.y,
                         p.x
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize()
+                        - options.componentGapWidth() / 4
+                        - options.arcSize()
                         + n.size.getWidth()
                         + 1,
                         n.itergraph.posLine.y);
@@ -929,7 +931,7 @@ public class Node {
                 }
                 break;
             case ITER:
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -940,78 +942,78 @@ public class Node {
                 // the quarter Arcs
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.sub.posLine.y
-                    - chart.componentArcSize(),
+                    - options.arcSize(),
                     90);
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posLine.y,
                     180);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() * 3 / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() * 3 / 2
                     + n.size.getWidth(),
-                    n.sub.posLine.y - chart.componentArcSize(),
+                    n.sub.posLine.y - options.arcSize(),
                     0);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() * 3 / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() * 3 / 2
                     + n.size.getWidth(),
                     n.posLine.y,
                     270);
                 // the short vertical lines between the quarter Arcs
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.sub.posLine.y
-                    - chart.componentArcSize() / 2
+                    - options.arcSize() / 2
                     + 1);
                 chart.drawLine(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.sub.posLine.y
-                    - chart.componentArcSize() / 2
+                    - options.arcSize() / 2
                     + 1);
                 // the two short horizontal lines between the quater Arcs and
                 // the components
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize()
+                    + options.componentGapWidth() / 4
+                    + options.arcSize()
                     - 1,
                     n.sub.posLine.y,
                     p.x
-                    + chart.componentGapWidth(),
+                    + options.componentGapWidth(),
                     n.sub.posLine.y);
                 chart.drawLine(
                     p.x
-                    - chart.componentGapWidth()
+                    - options.componentGapWidth()
                     + n.size.getWidth(),
                     n.sub.posLine.y,
                     p.x
                     + n.size.getWidth()
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() + 1,
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() + 1,
                     n.sub.posLine.y);
                 // the long horizontal line in the middle
                 chart.drawLine(
@@ -1023,7 +1025,7 @@ public class Node {
                 n.sub.drawComponentsInverse(
                     chart,
                     new Point(
-                        p.x - chart.componentGapWidth() + n.size.getWidth(),
+                        p.x - options.componentGapWidth() + n.size.getWidth(),
                         0),
                     n.size);
                 p.x += n.size.getWidth();
@@ -1035,84 +1037,84 @@ public class Node {
                         p.x,
                         n.posLine.y,
                         p.x
-                        + chart.componentGapWidth() / 4
+                        + options.componentGapWidth() / 4
                         + 1,
                         n.posLine.y);
                     // the short horizontal line at the beginning of the second
                     // component
                     chart.drawLine(
-                        chart.initialX(),
+                        options.initialX(),
                         n.next.posLine.y,
-                        chart.initialX()
-                        - chart.componentGapWidth() / 4,
+                        options.initialX()
+                        - options.componentGapWidth() / 4,
                         n.next.posLine.y);
                     // the quarter Arcs
                     chart.drawArcCorner(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        - chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        - options.arcSize() / 2,
                         n.posLine.y,
                         270);
                     chart.drawArcCorner(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        - chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        - options.arcSize() / 2,
                         n.posEnd.y
-                        - chart.componentArcSize(),
+                        - options.arcSize(),
                         0);
                     chart.drawArcCorner(
-                        chart.initialX()
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() / 2,
+                        options.initialX()
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2,
                         n.posEnd.y,
                         180);
                     chart.drawArcCorner(
-                        chart.initialX()
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() / 2,
+                        options.initialX()
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2,
                         n.next.posLine.y
-                        - chart.componentArcSize(),
+                        - options.arcSize(),
                         90);
                     // the short vertical lines between the quarter Arcs
                     chart.drawLine(
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
                         n.posLine.y
-                        + chart.componentArcSize() / 2,
+                        + options.arcSize() / 2,
                         p.x
-                        + chart.componentGapWidth() / 4
-                        + chart.componentArcSize() / 2,
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
                         n.posEnd.y
-                        - chart.componentArcSize() / 2
+                        - options.arcSize() / 2
                         + 1);
                     chart.drawLine(
-                        chart.initialX()
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() / 2,
+                        options.initialX()
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2,
                         n.posEnd.y
-                        + chart.componentArcSize() / 2,
-                        chart.initialX()
-                        - chart.componentGapWidth() / 4
-                        - chart.componentArcSize() / 2,
+                        + options.arcSize() / 2,
+                        options.initialX()
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2,
                         n.next.posLine.y
-                        - chart.componentArcSize() / 2
+                        - options.arcSize() / 2
                         + 1);
                     // the long horizontal line in the middle oft the two
                     // components
                     chart.drawLine(
                         p.x
-                        + chart.componentGapWidth() / 4 + 1,
+                        + options.componentGapWidth() / 4 + 1,
                         n.posEnd.y,
-                        chart.initialX()
-                        - chart.componentGapWidth() / 4,
+                        options.initialX()
+                        - options.componentGapWidth() / 4,
                         n.posEnd.y);
 
-                    p.x = chart.initialX();
+                    p.x = options.initialX();
                 }
                 break;
             case ALT: {
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -1125,7 +1127,7 @@ public class Node {
                 chart.drawLine(
                     p.x,
                     n.posLine.y,
-                    p.x + chart.componentArcSize() * 3 / 2,
+                    p.x + options.arcSize() * 3 / 2,
                     n.posLine.y);
                 chart.drawLine(
                     p.x
@@ -1133,7 +1135,7 @@ public class Node {
                     n.posLine.y,
                     p.x
                     + n.altSize.getWidth()
-                    - chart.componentArcSize() * 3 / 2,
+                    - options.arcSize() * 3 / 2,
                     n.posLine.y);
                 Node a = n;
                 boolean first = true;
@@ -1141,14 +1143,14 @@ public class Node {
                     // the horizontal lines at the beginning and the end
                     chart.drawLine(
                         p.x
-                        + chart.componentArcSize() * 3 / 2,
+                        + options.arcSize() * 3 / 2,
                         a.sub.posLine.y,
                         p.x
                         + (n.altSize.getWidth() - a.size.getWidth()) / 2,
                         a.sub.posLine.y);
                     chart.drawLine(
                         p.x
-                        - chart.componentArcSize() * 3 / 2
+                        - options.arcSize() * 3 / 2
                         + n.altSize.getWidth()
                         + 1,
                         a.sub.posLine.y,
@@ -1162,7 +1164,7 @@ public class Node {
                         chart.drawArcCorner(
                         p.x
                         + n.altSize.getWidth()
-                        - chart.componentArcSize(),
+                        - options.arcSize(),
                         n.posLine.y,
                         180);
                         first = false;
@@ -1170,39 +1172,39 @@ public class Node {
                         // else draw other arcs and vertical lines
                         chart.drawArcCorner(
                             p.x
-                            + chart.componentArcSize(),
+                            + options.arcSize(),
                             a.sub.posLine.y
-                            - chart.componentArcSize(),
+                            - options.arcSize(),
                             90);
                         chart.drawLine(
                             p.x
-                            + chart.componentArcSize(),
+                            + options.arcSize(),
                             n.posLine.y
-                            + chart.componentArcSize() / 2,
+                            + options.arcSize() / 2,
                             p.x
-                            + chart.componentArcSize(),
+                            + options.arcSize(),
                             a.posLine.y
-                            - chart.componentArcSize() / 2
-                            + chart.symbolGapHeight() - 2);
+                            - options.arcSize() / 2
+                            + options.symbolGapHeight() - 2);
                         chart.drawArcCorner(
                             p.x
-                            - chart.componentArcSize() * 2
+                            - options.arcSize() * 2
                             + n.altSize.getWidth(),
                             a.sub.posLine.y
-                            - chart.componentArcSize(),
+                            - options.arcSize(),
                             0);
                         chart.drawLine(
                             p.x
-                            - chart.componentArcSize()
+                            - options.arcSize()
                             + n.altSize.getWidth(),
                             n.posLine.y
-                            + chart.componentArcSize() / 2,
+                            + options.arcSize() / 2,
                             p.x
-                            - chart.componentArcSize()
+                            - options.arcSize()
                             + n.altSize.getWidth(),
                             a.posLine.y
-                            - chart.componentArcSize() / 2
-                            + chart.symbolGapHeight()
+                            - options.arcSize() / 2
+                            + options.symbolGapHeight()
                             - 2);
                     }
                     a.sub.drawComponents(
@@ -1227,16 +1229,16 @@ public class Node {
                     p.x,
                     n.posLine.y,
                     p.x
-                    + chart.componentGapWidth() / 4,
+                    + options.componentGapWidth() / 4,
                     n.posLine.y);
                 chart.drawArrow(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.arrowSize(),
+                    + options.componentGapWidth() / 4
+                    + options.arrowSize(),
                     n.posLine.y,
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.arrowSize(),
+                    + options.componentGapWidth() / 4
+                    + options.arrowSize(),
                     n.posLine.y,
                     Chart.Direction.RIGHT);
             }
@@ -1252,22 +1254,22 @@ public class Node {
         Node n = this; // current node in the level
         boolean samelevel = true; // next node in same level?
         Point p1 = new Point(0, 0);
-
+        ChartOptions options = chart.getOptions();
         while (n != null && samelevel) {
             p.x -= n.size.getWidth();
             if (n.typ == NodeType.TERM || n.typ == NodeType.NONTERM) {
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y
-                        - chart.componentGapHeight() / 2,
+                        - options.componentGapHeight() / 2,
                         n.size.getWidth(),
                         n.size.getHeight());
                 }
                 if (n.typ == NodeType.TERM) {
                     // the quarter Arcs
                     final int arcSize =
-                        (n.size.getHeight() - chart.componentGapHeight()) / 2;
+                        (n.size.getHeight() - options.componentGapHeight()) / 2;
                     chart.drawArc(
                         p.x,
                         n.posBegin.y,
@@ -1301,43 +1303,43 @@ public class Node {
                     // quarter Arcs
                     chart.drawLine(
                         p.x
-                        + (n.size.getHeight() - chart.componentGapHeight()) / 4
+                        + (n.size.getHeight() - options.componentGapHeight()) / 4
                         - 1,
                         n.posBegin.y,
                         p.x
                         + n.size.getWidth()
-                        - (n.size.getHeight() - chart.componentGapHeight()) / 4
+                        - (n.size.getHeight() - options.componentGapHeight()) / 4
                         + 1,
                         n.posBegin.y);
                     chart.drawLine(
                         p.x
-                        + (n.size.getHeight() - chart.componentGapHeight()) / 4
+                        + (n.size.getHeight() - options.componentGapHeight()) / 4
                         - 1,
                         n.posEnd.y,
                         p.x
                         + n.size.getWidth()
-                        - (n.size.getHeight() - chart.componentGapHeight()) / 4
+                        - (n.size.getHeight() - options.componentGapHeight()) / 4
                         + 1,
                         n.posEnd.y);
                     chart.drawLine(
                         p.x,
                         n.posLine.y
-                        + (n.size.getHeight() - chart.componentGapHeight()) / 4
+                        + (n.size.getHeight() - options.componentGapHeight()) / 4
                         + 1,
                         p.x,
                         n.posLine.y
-                        - (n.size.getHeight() - chart.componentGapHeight()) / 4
+                        - (n.size.getHeight() - options.componentGapHeight()) / 4
                         - 1);
                     chart.drawLine(
                         p.x
                         + n.size.getWidth(),
                         n.posLine.y
-                        + (n.size.getHeight() - chart.componentGapHeight()) / 4
+                        + (n.size.getHeight() - options.componentGapHeight()) / 4
                         + 1,
                         p.x
                         + n.size.getWidth(),
                         n.posLine.y
-                        - (n.size.getHeight() - chart.componentGapHeight()) / 4
+                        - (n.size.getHeight() - options.componentGapHeight()) / 4
                         - 1);
                 } else {
                     n.posBegin.x = p.x;
@@ -1346,7 +1348,7 @@ public class Node {
                         n.posBegin.x,
                         n.posBegin.y,
                         n.size.getWidth(),
-                        n.size.getHeight() - chart.componentGapHeight());
+                        n.size.getHeight() - options.componentGapHeight());
                 }
                 // StringFormat drawFormat = new StringFormat();
                 // drawFormat.setAlignment(StringAlignment.Center);
@@ -1366,7 +1368,7 @@ public class Node {
                     p.x,
                     n.posBegin.y,
                     n.size.getWidth(),
-                    n.size.getHeight() - chart.componentGapHeight());
+                    n.size.getHeight() - options.componentGapHeight());
 
                 chart.drawArrow(
                     p.x + n.size.getWidth(),
@@ -1384,10 +1386,10 @@ public class Node {
                         p.x,
                         n.posLine.y,
                         p.x
-                        - chart.componentGapWidth() / 2,
+                        - options.componentGapWidth() / 2,
                         n.posLine.y,
                         Chart.Direction.LEFT);
-                    p.x -= chart.componentGapWidth() / 2;
+                    p.x -= options.componentGapWidth() / 2;
                 }
                 if (!n.up
                     && n.next != null
@@ -1402,14 +1404,14 @@ public class Node {
                         chart.drawArrow(
                             p.x,
                             n.posLine.y,
-                            p.x - chart.componentGapWidth() / 2,
+                            p.x - options.componentGapWidth() / 2,
                             n.posLine.y,
                             Chart.Direction.LEFT);
-                        p.x -= chart.componentGapWidth() / 2;
+                        p.x -= options.componentGapWidth() / 2;
                     }
                 }
             } else if (n.typ == NodeType.EPS) {
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -1423,7 +1425,7 @@ public class Node {
                     p.x + n.size.getWidth(),
                     n.posLine.y);
             } else if (n.typ == NodeType.OPT) {
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -1435,92 +1437,92 @@ public class Node {
                 chart.drawLine(
                     p.x,
                     n.posLine.y,
-                    p.x + chart.componentGapWidth(),
+                    p.x + options.componentGapWidth(),
                     n.posLine.y);
                 chart.drawLine(
                     p.x + n.size.getWidth(),
                     n.posLine.y,
-                    p.x + n.size.getWidth() - chart.componentGapWidth(),
+                    p.x + n.size.getWidth() - options.componentGapWidth(),
                     n.posLine.y);
                 // the quarter Arcs
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    - options.arcSize() / 2,
                     n.posLine.y,
                     270);
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posEnd.y
-                    - chart.componentArcSize()
-                    - chart.componentGapHeight() / 2,
+                    - options.arcSize()
+                    - options.componentGapHeight() / 2,
                     90);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.posLine.y,
                     180);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() * 3 / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() * 3 / 2
                     + n.size.getWidth(),
                     n.posEnd.y
-                    - chart.componentArcSize()
-                    - chart.componentGapHeight() / 2,
+                    - options.arcSize()
+                    - options.componentGapHeight() / 2,
                     0);
                 // the short vertical lines between the quarter Arcs
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posEnd.y
-                    - chart.componentArcSize() / 2
-                    - chart.componentGapHeight() / 2
+                    - options.arcSize() / 2
+                    - options.componentGapHeight() / 2
                     + 1);
                 chart.drawLine(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.posEnd.y
-                    - chart.componentArcSize() / 2
-                    - chart.componentGapHeight() / 2
+                    - options.arcSize() / 2
+                    - options.componentGapHeight() / 2
                     + 1);
                 // the the long horizontal line between the quarter Arcs
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize(),
+                    + options.componentGapWidth() / 4
+                    + options.arcSize(),
                     n.posEnd.y
-                    - chart.componentGapHeight() / 2,
+                    - options.componentGapHeight() / 2,
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize()
+                    - options.componentGapWidth() / 4
+                    - options.arcSize()
                     + n.size.getWidth()
                     + 1,
                     n.posEnd.y
-                    - chart.componentGapHeight() / 2);
+                    - options.componentGapHeight() / 2);
 
-                p1.x = p.x + n.size.getWidth() - chart.componentGapWidth();
+                p1.x = p.x + n.size.getWidth() - options.componentGapWidth();
                 n.sub.drawComponentsInverse(chart, p1, n.size);
             } else if (n.typ == NodeType.RERUN && n.itergraph == null) {
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -1532,93 +1534,93 @@ public class Node {
                 chart.drawLine(
                     p.x,
                     n.posLine.y,
-                    p.x + chart.componentGapWidth(),
+                    p.x + options.componentGapWidth(),
                     n.posLine.y);
                 chart.drawLine(
                     p.x + n.size.getWidth(),
                     n.posLine.y,
-                    p.x + n.size.getWidth() - chart.componentGapWidth(),
+                    p.x + n.size.getWidth() - options.componentGapWidth(),
                     n.posLine.y);
                 // the quarter Arcs
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posEnd.y
-                    - chart.componentGapHeight() / 2
-                    - chart.componentArcSize(),
+                    - options.componentGapHeight() / 2
+                    - options.arcSize(),
                     90);
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posLine.y,
                     180);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() * 3 / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() * 3 / 2
                     + n.size.getWidth(),
                     n.posEnd.y
-                    - chart.componentGapHeight() / 2
-                    - chart.componentArcSize(),
+                    - options.componentGapHeight() / 2
+                    - options.arcSize(),
                     0);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() * 3 / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() * 3 / 2
                     + n.size.getWidth(),
                     n.posLine.y,
                     270);
                 // the short vertical lines between the quarter Arcs
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posEnd.y
-                    - chart.componentGapHeight() / 2
-                    - chart.componentArcSize() / 2
+                    - options.componentGapHeight() / 2
+                    - options.arcSize() / 2
                     + 1);
                 chart.drawLine(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.posEnd.y
-                    - chart.componentGapHeight() / 2
-                    - chart.componentArcSize() / 2
+                    - options.componentGapHeight() / 2
+                    - options.arcSize() / 2
                     + 1);
                 // the the long horizontal line between the quarter Arcs
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize()
+                    + options.componentGapWidth() / 4
+                    + options.arcSize()
                     - 1,
                     n.posEnd.y
-                    - chart.componentGapHeight() / 2,
+                    - options.componentGapHeight() / 2,
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize()
+                    - options.componentGapWidth() / 4
+                    - options.arcSize()
                     + n.size.getWidth()
                     + 1,
                     n.posEnd.y
-                    - chart.componentGapHeight() / 2);
+                    - options.componentGapHeight() / 2);
 
-                p1.x = p.x + n.size.getWidth() - chart.componentGapWidth();
+                p1.x = p.x + n.size.getWidth() - options.componentGapWidth();
                 n.sub.drawComponentsInverse(chart, p1, n.size);
             } else if (n.typ == NodeType.RERUN && n.itergraph != null) {
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -1647,65 +1649,65 @@ public class Node {
                 // the quarter Arcs
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.itergraph.posLine.y
-                    - chart.componentArcSize(),
+                    - options.arcSize(),
                     90);
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posLine.y,
                     180);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() * 3 / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() * 3 / 2
                     + n.size.getWidth(),
                     n.itergraph.posLine.y
-                    - chart.componentArcSize(),
+                    - options.arcSize(),
                     0);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() * 3 / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() * 3 / 2
                     + n.size.getWidth(),
                     n.posLine.y,
                     270);
                 // the short vertical lines between the quarter Arcs
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.itergraph.posLine.y
-                    - chart.componentArcSize() / 2
+                    - options.arcSize() / 2
                     + 1);
                 chart.drawLine(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.itergraph.posLine.y
-                    - chart.componentArcSize() / 2
+                    - options.arcSize() / 2
                     + 1);
                 // the two short lines at the beginning and the end of the
                 // second component
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize(),
+                    + options.componentGapWidth() / 4
+                    + options.arcSize(),
                     n.itergraph.posLine.y,
                     p.x
                     + n.size.getWidth() / 2
@@ -1719,8 +1721,8 @@ public class Node {
                     + 1,
                     n.itergraph.posLine.y,
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize()
+                    - options.componentGapWidth() / 4
+                    - options.arcSize()
                     + n.size.getWidth()
                     + 1,
                     n.itergraph.posLine.y);
@@ -1742,7 +1744,7 @@ public class Node {
                         n.posEnd.y),
                     n.size);
             } else if (n.typ == NodeType.ITER) {
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -1753,79 +1755,79 @@ public class Node {
                 // the quarter Arcs
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.sub.posLine.y
-                    - chart.componentArcSize(),
+                    - options.arcSize(),
                     90);
                 chart.drawArcCorner(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posLine.y,
                     180);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() * 3 / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() * 3 / 2
                     + n.size.getWidth(),
                     n.sub.posLine.y
-                    - chart.componentArcSize(),
+                    - options.arcSize(),
                     0);
                 chart.drawArcCorner(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() * 3 / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() * 3 / 2
                     + n.size.getWidth(),
                     n.posLine.y,
                     270);
                 // the short vertical lines between the quarter Arcs
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize() / 2,
+                    + options.componentGapWidth() / 4
+                    + options.arcSize() / 2,
                     n.sub.posLine.y
-                    - chart.componentArcSize() / 2
+                    - options.arcSize() / 2
                     + 1);
                 chart.drawLine(
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.posLine.y
-                    + chart.componentArcSize() / 2,
+                    + options.arcSize() / 2,
                     p.x
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize() / 2
+                    - options.componentGapWidth() / 4
+                    - options.arcSize() / 2
                     + n.size.getWidth(),
                     n.sub.posLine.y
-                    - chart.componentArcSize() / 2
+                    - options.arcSize() / 2
                     + 1);
                 // the two short horizontal lines between the quater Arcs and
                 // the components
                 chart.drawLine(
                     p.x
-                    + chart.componentGapWidth() / 4
-                    + chart.componentArcSize()
+                    + options.componentGapWidth() / 4
+                    + options.arcSize()
                     - 1,
                     n.sub.posLine.y,
                     p.x
-                    + chart.componentGapWidth(),
+                    + options.componentGapWidth(),
                     n.sub.posLine.y);
                 chart.drawLine(
                     p.x
-                    - chart.componentGapWidth()
+                    - options.componentGapWidth()
                     + n.size.getWidth(),
                     n.sub.posLine.y,
                     p.x
                     + n.size.getWidth()
-                    - chart.componentGapWidth() / 4
-                    - chart.componentArcSize()
+                    - options.componentGapWidth() / 4
+                    - options.arcSize()
                     + 1,
                     n.sub.posLine.y);
                 // the long horizontal line in the middle
@@ -1835,11 +1837,11 @@ public class Node {
                     p.x + n.size.getWidth(),
                     n.posLine.y);
 
-                p1.x = p.x + chart.componentGapWidth();
+                p1.x = p.x + options.componentGapWidth();
                 n.sub.drawComponents(chart, p1, n.size);
             } else if (n.typ == NodeType.ALT) {
                 p.x -= n.altSize.getWidth() - n.size.getWidth();
-                if (chart.showBorders()) {
+                if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
                         n.posBegin.y,
@@ -1853,7 +1855,7 @@ public class Node {
                     p.x,
                     n.posLine.y,
                     p.x
-                    + chart.componentArcSize() * 3 / 2,
+                    + options.arcSize() * 3 / 2,
                     n.posLine.y);
                 chart.drawLine(
                     p.x
@@ -1861,24 +1863,24 @@ public class Node {
                     n.posLine.y,
                     p.x
                     + n.altSize.getWidth()
-                    - chart.componentArcSize() * 3 / 2,
+                    - options.arcSize() * 3 / 2,
                     n.posLine.y);
-                p1.x = p.x + 2 * chart.componentGapWidth();
-                p1.y = p1.y + chart.componentGapHeight();
+                p1.x = p.x + 2 * options.componentGapWidth();
+                p1.y = p1.y + options.componentGapHeight();
                 Node a = n;
                 boolean first = true;
                 while (a != null) {
                     // the horizontal lines at the beginning and the end
                     chart.drawLine(
                         p.x
-                        + chart.componentArcSize() * 3 / 2,
+                        + options.arcSize() * 3 / 2,
                         a.sub.posLine.y,
                         p.x
                         + (n.altSize.getWidth() - a.size.getWidth()) / 2,
                         a.sub.posLine.y);
                     chart.drawLine(
                         p.x
-                        - chart.componentArcSize() * 3 / 2
+                        - options.arcSize() * 3 / 2
                         + n.altSize.getWidth()
                         + 1,
                         a.sub.posLine.y,
@@ -1892,7 +1894,7 @@ public class Node {
                         chart.drawArcCorner(
                             p.x
                             + n.altSize.getWidth()
-                            - chart.componentArcSize(),
+                            - options.arcSize(),
                             n.posLine.y,
                             180);
                         first = false;
@@ -1900,38 +1902,38 @@ public class Node {
                         // else draw other Arcs and vertical lines
                         chart.drawArcCorner(
                             p.x
-                            + chart.componentArcSize(),
+                            + options.arcSize(),
                             a.sub.posLine.y
-                            - chart.componentArcSize(),
+                            - options.arcSize(),
                             90);
                         chart.drawLine(
                             p.x
-                            + chart.componentArcSize(),
+                            + options.arcSize(),
                             n.posLine.y
-                            + chart.componentArcSize() / 2,
+                            + options.arcSize() / 2,
                             p.x
-                            + chart.componentArcSize(),
+                            + options.arcSize(),
                             a.posLine.y
-                            - chart.componentArcSize() / 2
+                            - options.arcSize() / 2
                             + 1);
                         chart.drawArcCorner(
                             p.x
-                            - chart.componentArcSize() * 2
+                            - options.arcSize() * 2
                             + n.altSize.getWidth(),
                             a.sub.posLine.y
-                            - chart.componentArcSize(),
+                            - options.arcSize(),
                             0);
                         chart.drawLine(
                             p.x
-                            - chart.componentArcSize()
+                            - options.arcSize()
                             + n.altSize.getWidth(),
                             n.posLine.y
-                            + chart.componentArcSize() / 2,
+                            + options.arcSize() / 2,
                             p.x
-                            - chart.componentArcSize()
+                            - options.arcSize()
                             + n.altSize.getWidth(),
                             a.posLine.y
-                            - chart.componentArcSize() / 2
+                            - options.arcSize() / 2
                             + 1);
                     }
                     Point pf =
@@ -1958,6 +1960,7 @@ public class Node {
         switch (typ) {
         case TERM:
         case NONTERM:
+        case EPS:
             break;
         case ALT:
             for (Node n = this; n != null; n = n.down) {
@@ -1965,18 +1968,32 @@ public class Node {
             }
             break;
         case ITER:
-            for (Node node : nextChildren(sub)) {
-                node.accept(visitor);
-            }
+                for(Node n: nextChildren(sub)) {
+                	n.accept(visitor);
+                }
             break;
+        case OPT:
+                sub.accept(visitor);
+            break;
+        case RERUN:
+			if (itergraph != null) {
+				itergraph.accept(visitor);
+			}
+            sub.accept(visitor);
+        break;
         default:
             throw new RuntimeException("unknown <" + typ + ">");
         }
+		if (next != null && !up) {
+			next.accept(visitor);
+		}
     }
 
     @Override
     public String toString() {
-        return sym.toString();
+    	StringBuffer buffer = new StringBuffer();
+        unparse(buffer);
+        return buffer.toString();
     }
 }
 

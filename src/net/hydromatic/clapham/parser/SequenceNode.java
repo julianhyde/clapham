@@ -25,7 +25,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 package net.hydromatic.clapham.parser;
 
 import java.util.List;
@@ -35,34 +35,50 @@ import net.hydromatic.clapham.graph.Graph;
 
 /**
  * TODO:
-*
-* @author jhyde
-* @version $Id$
-* @since Jul 30, 2008
-*/
+ * 
+ * @author jhyde
+ * @version $Id$
+ * @since Jul 30, 2008
+ */
 public class SequenceNode extends BaseEbnfNode {
-    public final List<EbnfNode> list;
+	public final List<EbnfNode> list;
 
-    public SequenceNode(List<EbnfNode> list) {
-        this.list = list;
-    }
+	public SequenceNode(List<EbnfNode> list) {
+		this.list = list;
+	}
 
-    public Graph toGraph(Grammar grammar) {
-        Graph g = null;
-        for (EbnfNode node : list) {
-            if (g == null) {
-                g = node.toGraph(grammar);
-            } else {
-                Graph g2 = node.toGraph(grammar);
-                grammar.makeSequence(g, g2);
-            }
-        }
-        return g;
-    }
+	public Graph toGraph(Grammar grammar) {
+		Graph g = null;
+		for (EbnfNode node : list) {
+			if (g == null) {
+				g = node.toGraph(grammar);
+			} else {
+				Graph g2 = node.toGraph(grammar);
+				grammar.makeSequence(g, g2);
+			}
+		}
+		return g;
+	}
 
-    public void toString(StringBuilder buf) {
-        toString(buf, "SequenceNode(", list, ")");
-    }
+	public void toString(StringBuilder buf) {
+		toString(buf, "SequenceNode(", list, ")");
+	}
+
+	public String toEbnf(EbnfDecorator decorator) {
+		int start = 0;
+		if (list.size() > 1 && list.get(1) instanceof MandatoryRepeatNode) {
+			start = 1;
+		}
+		StringBuilder buff = new StringBuilder();
+		final String SEPARATOR = " ";
+		for (int i = start; i < list.size(); i++) {
+			buff.append(list.get(i).toEbnf(decorator)).append(SEPARATOR);
+		}
+		if (buff.length() > 0) {
+			buff.setLength(buff.length() - SEPARATOR.length());
+		}
+		return buff.toString();
+	}
 }
 
 // End SequenceNode.java

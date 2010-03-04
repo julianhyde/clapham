@@ -59,6 +59,10 @@ public class IdentifierNode extends BaseEbnfNode {
     public void toString(StringBuilder buf) {
         buf.append(s);
     }
+    
+    public String toEbnf(EbnfDecorator decorator) {
+    	return decorator.beginNonterminal() + s + decorator.endNonterminal();
+    }
 }
 
 // End IdentifierNode.java

@@ -49,6 +49,8 @@ public interface EbnfNode {
     Graph toGraph(Grammar grammar);
 
     void toString(StringBuilder buf);
+    
+    String toEbnf(EbnfDecorator decorator);
 }
 
 // End EbnfNode.java
