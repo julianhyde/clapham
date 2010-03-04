@@ -29,115 +29,115 @@ package net.hydromatic.clapham.chart;
 
 import java.io.File;
 
-public abstract class AbstractChartOptions implements MutableChartOptions {
+public abstract class AbstractChartOptions implements ChartOptions {
 
-    private int arcSize;
+	private int arcSize;
 
-    private int arrowSize;
+	private int arrowSize;
 
-    private int componentGapHeight;
+	private int componentGapHeight;
 
-    private int componentGapWidth;
+	private int componentGapWidth;
 
-    private int initialX;
+	private int initialX;
 
-    private int initialY;
+	private int initialY;
 
-    private boolean showBorders;
+	private boolean showBorders;
 
-    private int symbolGapHeight;
+	private int symbolGapHeight;
 
-    private int symbolGapWidth;
+	private int symbolGapWidth;
 
-    private String imageFormat;
+	private String imageFormat;
 
-    private File outputDirectory;
+	private File outputDirectory;
 
-    private boolean optimize;
+	private boolean optimize;
 
-    public AbstractChartOptions() {
-	this.arcSize = ARC_SIZE;
-	this.arrowSize = ARROW_SIZE;
-	this.componentGapHeight = COMPONENT_GAP_HEIGHT;
-	this.componentGapWidth = COMPONENT_GAP_WIDTH;
-	this.initialX = INITIAL_X;
-	this.initialY = INITIAL_Y;
-	this.showBorders = false;
-	this.optimize = true;
-	this.symbolGapHeight = SYMBOL_GAP_HEIGHT;
-	this.symbolGapWidth = SYMBOL_GAP_WIDTH;
-    }
+	public AbstractChartOptions() {
+		this.arcSize = ARC_SIZE;
+		this.arrowSize = ARROW_SIZE;
+		this.componentGapHeight = COMPONENT_GAP_HEIGHT;
+		this.componentGapWidth = COMPONENT_GAP_WIDTH;
+		this.initialX = INITIAL_X;
+		this.initialY = INITIAL_Y;
+		this.showBorders = false;
+		this.optimize = true;
+		this.symbolGapHeight = SYMBOL_GAP_HEIGHT;
+		this.symbolGapWidth = SYMBOL_GAP_WIDTH;
+	}
 
-    public boolean optimize() {
-	return optimize;
-    }
+	public boolean optimize() {
+		return optimize;
+	}
 
-    public int arcSize() {
-	return arcSize;
-    }
+	public int arcSize() {
+		return arcSize;
+	}
 
-    public int arrowSize() {
-	return arrowSize;
-    }
+	public int arrowSize() {
+		return arrowSize;
+	}
 
-    public int componentGapHeight() {
-	return componentGapHeight;
-    }
+	public int componentGapHeight() {
+		return componentGapHeight;
+	}
 
-    public int componentGapWidth() {
-	return componentGapWidth;
-    }
+	public int componentGapWidth() {
+		return componentGapWidth;
+	}
 
-    public int initialX() {
-	return initialX;
-    }
+	public int initialX() {
+		return initialX;
+	}
 
-    public int initialY() {
-	return initialY;
-    }
+	public int initialY() {
+		return initialY;
+	}
 
-    public boolean showBorders() {
-	return showBorders;
-    }
+	public boolean showBorders() {
+		return showBorders;
+	}
 
-    public int symbolGapHeight() {
-	return symbolGapHeight;
-    }
+	public int symbolGapHeight() {
+		return symbolGapHeight;
+	}
 
-    public int symbolGapWidth() {
-	return symbolGapWidth;
-    }
+	public int symbolGapWidth() {
+		return symbolGapWidth;
+	}
 
-    public MutableChartOptions withComponentGapHeight(int height) {
-	componentGapHeight = height;
-	return this;
-    }
+	public ChartOptions withComponentGapHeight(int height) {
+		componentGapHeight = height;
+		return this;
+	}
 
-    public MutableChartOptions withArcSize(int size) {
-	arcSize = size;
-	return this;
-    }
+	public ChartOptions withArcSize(int size) {
+		arcSize = size;
+		return this;
+	}
 
-    public void withInitialLocation(int x, int y) {
-	initialX = x;
-	initialY = y;
-    }
+	public void withInitialLocation(int x, int y) {
+		initialX = x;
+		initialY = y;
+	}
 
-    public String imageFormat() {
-	return imageFormat;
-    }
+	public String imageFormat() {
+		return imageFormat;
+	}
 
-    public File outputDirectory() {
-	return outputDirectory;
-    }
+	public File outputDirectory() {
+		return outputDirectory;
+	}
 
-    public MutableChartOptions withOuputDirectory(File outputDirectory) {
-	this.outputDirectory = outputDirectory;
-	return this;
-    }
+	public ChartOptions withOuputDirectory(File outputDirectory) {
+		this.outputDirectory = outputDirectory;
+		return this;
+	}
 
-    public MutableChartOptions withOptimize(boolean optimize) {
-	this.optimize = optimize;
-	return this;
-    }
+	public ChartOptions withOptimize(boolean optimize) {
+		this.optimize = optimize;
+		return this;
+	}
 }

@@ -27,35 +27,73 @@
  */
 package net.hydromatic.clapham.chart;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 
 import net.hydromatic.clapham.graph.Node;
 
 /**
- * TODO:
+ * <p>The main class for drawing. This class contains all the basic drawing
+ * functions to generate railroad diagrams.</p>
  * 
+ * <p>Usage</p>
+ * <pre>
+ * Chart chart = ......//a concrete implementation
+ * 
+ * ChartOptions options = chart.createOptions();//Create the default options for this chart
+ * options.withOptimize(false); //change the optimize feature
+ * 
+ * chart.draw("rule");
+ * </pre>
  * @author Edgar Espina
  * @version $Id: $
+ * @see Java2DChart
  */
 public interface Chart {
 
-	public enum Direction {
+	public enum ArrowDirection {
 		LEFT, RIGHT, UP, DOWN
 	}
 
+	/**
+	 * 
+	 * This interface allow to traverse all the nodes
+	 * 
+	 */
 	interface NodeVisitor {
 		void visit(Node node);
 	}
 
-	MutableChartOptions createOptions();
-	
-	MutableChartOptions createOptions(String fontName);
-	
-	MutableChartOptions getOptions();
-	
-	void setOptions(MutableChartOptions options);
-	
+	/**
+	 * Create the chart options with default values
+	 * 
+	 * @return
+	 */
+	ChartOptions createOptions();
+
+	/**
+	 * Create the chart options for the specific font
+	 * 
+	 * @param fontName
+	 * @return
+	 */
+	ChartOptions createOptions(String fontName);
+
+	/**
+	 * The options for this chart
+	 * 
+	 * @return
+	 */
+	ChartOptions getOptions();
+
+	/**
+	 * Set the options for this chart
+	 * 
+	 * @param options
+	 */
+	void setOptions(ChartOptions options);
+
 	void drawString(String text, int x, int y);
 
 	void drawRectangle(int x, int y, int width, int height);
@@ -64,24 +102,46 @@ public interface Chart {
 
 	void drawLine(int x1, int y1, int x2, int y2);
 
-	void drawArrow(int x1, int y1, int x2, int y2, Direction right);
+	void drawArrow(int x1, int y1, int x2, int y2, ArrowDirection right);
 
-	void drawArcCorner(int x, int y, int arcSize);	
+	void drawArcCorner(int x, int y, int arcSize);
 
 	void drawArc(int x, int y, int width, int height, int startAngle,
 			int arcAngle);
 
-	void calcDrawing();
+	/**
+	 * Initialize and check all the resources before drawing
+	 */
+	void prepare();
 
+	/**
+	 * Returns the size of the graph that corresponds to the given symbolName
+	 * 
+	 * @param symbolName
+	 * @return The size of the graph that corresponds to the given symbolName
+	 */
+	Dimension size(String symbolName);
+
+	/**
+	 * Draw the diagram in the underlying graphic object
+	 * 
+	 * @param symbolName
+	 */
 	void draw(String symbolName);
-	
-	void drawAndExport(String symbolName, File output) throws IOException;
+
+	/**
+	 * Draw the diagram in the underlying graphic object and save as an image (a
+	 * PNG image)
+	 * 
+	 * @param symbolName
+	 * @param outputDirectory
+	 *            The output directory
+	 * @throws IOException
+	 */
+	void drawAndExport(String symbolName, File outputDirectory)
+			throws IOException;
 
 	int fontHeightCorrectness();
-	
-	int getWidth();
-	
-	int getHeight();
 }
 
 // End Chart.java

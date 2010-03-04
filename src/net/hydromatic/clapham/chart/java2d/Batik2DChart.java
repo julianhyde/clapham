@@ -57,65 +57,56 @@ import org.w3c.dom.Document;
 public class Batik2DChart extends Java2DChart {
 
     public Batik2DChart(Grammar grammar) {
-	super(grammar, createGraphics());
-    }
-
-    @Override
-    public void draw(String symbolName) {
-	super.draw(symbolName);
-
-	final Dimension dimension = getDimension();
-
-	((SVGGraphics2D) g).setSVGCanvasSize(dimension);
+        super(grammar, createGraphics());
     }
 
     @Override
     public void drawAndExport(String symbolName, File output)
-	    throws IOException {
-	draw(symbolName);
+            throws IOException {
+        Dimension size = size(symbolName);
+        draw(symbolName);
 
-	File svgFile = new File(output.getParentFile(), symbolName + ".svg");
+        File svgFile = new File(output.getParentFile(), symbolName + ".svg");
 
-	SVGGraphics2D graphics = (SVGGraphics2D) g;
-	graphics.stream(svgFile.getPath(), true);
+        SVGGraphics2D graphics = (SVGGraphics2D) g;
+        graphics.setSVGCanvasSize(new Dimension(size.width, size.height));
+        graphics.stream(svgFile.getPath(), true);
 
-	try {
-	    toPng(svgFile, output);
-	} catch (TranscoderException e) {
-	    throw new IOException("Can not create: " + output, e);
-	}
-
-	svgFile.delete();
+        try {
+            toPng(svgFile, output);
+        } catch (TranscoderException e) {
+            throw new IOException("Can not create: " + output, e);
+        }
     }
 
     private static void toPng(File inFile, File file) throws IOException,
-			TranscoderException {
-	// Create a PNG transcoder
-	PNGTranscoder t = new PNGTranscoder();
+            TranscoderException {
+        // Create a PNG transcoder
+        PNGTranscoder t = new PNGTranscoder();
 
-	// Create the transcoder input.
-	TranscoderInput input = new TranscoderInput("file:" + inFile.getPath());
+        // Create the transcoder input.
+        TranscoderInput input = new TranscoderInput("file:" + inFile.getPath());
 
-	// Create the transcoder output.
-	OutputStream ostream = new FileOutputStream(file);
-	TranscoderOutput output = new TranscoderOutput(ostream);
+        // Create the transcoder output.
+        OutputStream ostream = new FileOutputStream(file);
+        TranscoderOutput output = new TranscoderOutput(ostream);
 
-	// Save the image.
-	t.transcode(input, output);
+        // Save the image.
+        t.transcode(input, output);
 
-	// Flush and close the stream.
-	ostream.flush();
-	ostream.close();
+        // Flush and close the stream.
+        ostream.flush();
+        ostream.close();
     }
 
     private static Graphics2D createGraphics() {
-	try {
-	    final DocumentBuilder documentBuilder = DocumentBuilderFactory
-					.newInstance().newDocumentBuilder();
-	    final Document document = documentBuilder.newDocument();
-	    return new SVGGraphics2D(document);
-	} catch (ParserConfigurationException e) {
-	    throw new RuntimeException("Error while creating the chart", e);
-	}
+        try {
+            final DocumentBuilder documentBuilder = DocumentBuilderFactory
+                    .newInstance().newDocumentBuilder();
+            final Document document = documentBuilder.newDocument();
+            return new SVGGraphics2D(document);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException("Error while creating the chart", e);
+        }
     }
 }

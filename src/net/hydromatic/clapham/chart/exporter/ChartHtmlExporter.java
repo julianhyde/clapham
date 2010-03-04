@@ -27,6 +27,7 @@
  */
 package net.hydromatic.clapham.chart.exporter;
 
+import java.awt.Dimension;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -44,7 +45,7 @@ import java.util.Map.Entry;
 
 import net.hydromatic.clapham.chart.Chart;
 import net.hydromatic.clapham.chart.ChartFactory;
-import net.hydromatic.clapham.chart.MutableChartOptions;
+import net.hydromatic.clapham.chart.ChartOptions;
 import net.hydromatic.clapham.chart.Chart.NodeVisitor;
 import net.hydromatic.clapham.graph.Grammar;
 import net.hydromatic.clapham.graph.GrammarFactory;
@@ -190,16 +191,22 @@ public class ChartHtmlExporter {
 
 		Chart chart = chartFactory.createChart(grammar);
 		// create chart options
-		MutableChartOptions options = chart.createOptions();
-		options.withOptimize(optimize).withInitialLocation(0, 0);
+		ChartOptions options = chart.createOptions();
+		options.withOptimize(optimize)
+		/**no top margin*/
+		.withInitialLocation(20, 0);
+		
 		chart.setOptions(options);
-		chart.calcDrawing();
+		chart.prepare();
+		
 		chart.drawAndExport(symbolName, outputFile);
+		
+		Dimension size = chart.size(symbolName);
 
 		// add documentation
 		String documentation = "";
 		if (documentationProvider != null) {
-			String doc = documentationProvider.grammar(symbolName);
+			String doc = documentationProvider.rule(symbolName);
 			if (doc != null) {
 				documentation = merge("doc.html", toMap("doc", doc));
 			}
@@ -214,8 +221,8 @@ public class ChartHtmlExporter {
 		}
 		Map<String, String> args = toMap("rule", symbolName, "map", map(
 				grammar, symbolName), "output", relativePath, "width", Integer
-				.toString(chart.getWidth()), "height", Integer.toString(chart
-				.getHeight()), "doc", documentation, "ebnf", ebnf);
+				.toString(size.width), "height", Integer.toString(size
+				.height), "doc", documentation, "ebnf", ebnf);
 		String out = merge("rule.html", args);
 		return out;
 	}

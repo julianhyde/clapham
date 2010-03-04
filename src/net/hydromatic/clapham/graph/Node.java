@@ -546,7 +546,7 @@ public class Node {
                     n.posLine.y,
                     p.x,
                     n.posLine.y,
-                    Chart.Direction.RIGHT);
+                    Chart.ArrowDirection.RIGHT);
                 p.x += n.size.getWidth();
                 // draw lines between t and nt nodes
                 if (!n.up
@@ -559,7 +559,7 @@ public class Node {
                         n.posLine.y,
                         p.x + options.componentGapWidth() / 2,
                         n.posLine.y,
-                        Chart.Direction.RIGHT);
+                        Chart.ArrowDirection.RIGHT);
                     p.x += options.componentGapWidth() / 2;
                 }
                 if (!n.up
@@ -572,7 +572,7 @@ public class Node {
                         n.posLine.y,
                         p.x + options.componentGapWidth() / 2,
                         n.posLine.y,
-                        Chart.Direction.RIGHT);
+                        Chart.ArrowDirection.RIGHT);
                     p.x += options.componentGapWidth() / 2;
                 }
                 break;
@@ -1240,7 +1240,7 @@ public class Node {
                     + options.componentGapWidth() / 4
                     + options.arrowSize(),
                     n.posLine.y,
-                    Chart.Direction.RIGHT);
+                    Chart.ArrowDirection.RIGHT);
             }
             n = n.next;
         }
@@ -1375,7 +1375,7 @@ public class Node {
                     n.posLine.y,
                     p.x + n.size.getWidth(),
                     n.posLine.y,
-                    Chart.Direction.LEFT);
+                    Chart.ArrowDirection.LEFT);
 
                 if (!n.up
                     && n.next != null
@@ -1388,7 +1388,7 @@ public class Node {
                         p.x
                         - options.componentGapWidth() / 2,
                         n.posLine.y,
-                        Chart.Direction.LEFT);
+                        Chart.ArrowDirection.LEFT);
                     p.x -= options.componentGapWidth() / 2;
                 }
                 if (!n.up
@@ -1406,7 +1406,7 @@ public class Node {
                             n.posLine.y,
                             p.x - options.componentGapWidth() / 2,
                             n.posLine.y,
-                            Chart.Direction.LEFT);
+                            Chart.ArrowDirection.LEFT);
                         p.x -= options.componentGapWidth() / 2;
                     }
                 }

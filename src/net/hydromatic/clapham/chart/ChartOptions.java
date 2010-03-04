@@ -162,4 +162,22 @@ public interface ChartOptions {
     void withInitialLocation(int x, int y);
 
     boolean optimize();
+    
+    /**
+     * Set the component gap height
+     * 
+     * @param height
+     * @return
+     */
+    ChartOptions withComponentGapHeight(int height);
+
+    /**
+     * Set the arc size
+     * 
+     * @param size
+     * @return
+     */
+    ChartOptions withArcSize(int size);
+
+    ChartOptions withOptimize(boolean optimize);
 }
