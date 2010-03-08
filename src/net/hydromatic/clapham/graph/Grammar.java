@@ -30,7 +30,6 @@
 package net.hydromatic.clapham.graph;
 
 import java.util.*;
-import java.util.List;
 import java.io.PrintStream;
 
 /**
@@ -63,14 +62,6 @@ public class Grammar {
         }
     }
     
-    /**
-     * Returns a read-only list of nodes
-     * @return A read-only list of nodes
-     */
-    public List<Node> nodes() {
-    	return Collections.unmodifiableList(nodes);
-    }
-
     public void setOptimizeGraph(boolean value) {
         this.optimizeGraph = value;
     }
@@ -79,7 +70,7 @@ public class Grammar {
         return optimizeGraph;
     }
 
-    boolean compare(Node n1, Node n2) {
+    private boolean compare(Node n1, Node n2) {
         if (n1.typ == n2.typ) {
             if (n1.typ == NodeType.NONTERM || n1.typ == NodeType.TERM) {
                 if (!n1.sym.name.equals(n2.sym.name)) {
@@ -91,7 +82,7 @@ public class Grammar {
         return false;
     }
 
-    boolean deepCompare(Node n1, Node n2, boolean untilIter) {
+    private boolean deepCompare(Node n1, Node n2, boolean untilIter) {
         boolean samelevel = true;
         Node identifier = n2; // helps to identify the relevant iter node
         while (n1 != null && samelevel) {
@@ -222,7 +213,7 @@ public class Grammar {
     /**
      * Removes all unnecessary and wrong linebreaks (wrap-nodes) from the graph.
      */
-    void removeWrongLinebreaks(Node n, Node parent, Symbol s) {
+    private void removeWrongLinebreaks(Node n, Node parent, Symbol s) {
         boolean samelevel = true;
         Node i = n;
         while (i != null && samelevel) {
@@ -279,7 +270,7 @@ public class Grammar {
         }
     }
 
-    void removeRedundancy(Node n, Node parent, Symbol s) {
+    private void removeRedundancy(Node n, Node parent, Symbol s) {
         boolean samelevel = true; // next node in same level?
         Node begin = n;
         while (n != null && samelevel) {
@@ -362,7 +353,7 @@ public class Grammar {
      * Removes all empty ('epsilon') iter/opt nodes in alternatives, as well as
      * multiple epsilon nodes at the beginning.
      */
-    void removeEps(Node n, Node parent, Symbol s) {
+    private void removeEps(Node n, Node parent, Symbol s) {
         boolean samelevel = true; // next node in same level?
         Node begin = n;
         while (n != null && samelevel) {
@@ -500,7 +491,7 @@ public class Grammar {
         }
     }
 
-    void removeSameAlts(Node alt) {
+    private void removeSameAlts(Node alt) {
         Node a = alt;
         while (a != null) {
             Node i = a.down;
@@ -518,7 +509,7 @@ public class Grammar {
         }
     }
 
-    void putEpsAtBeginningOfAlt(Node n, Node alt, Node parent, Symbol s) {
+    private void putEpsAtBeginningOfAlt(Node n, Node alt, Node parent, Symbol s) {
         Node a = alt;
         boolean containsEps = false;
 
@@ -585,7 +576,7 @@ public class Grammar {
     }
 
     // optimizes enclosing structures and recursively its substructures
-    void optimizeIter(Node n, Node parent, Symbol s) {
+    private void optimizeIter(Node n, Node parent, Symbol s) {
         boolean samelevel = true; // next node in same level?
         Node i = n;
 
@@ -715,6 +706,11 @@ public class Grammar {
             p = q;
         }
     }
+    
+    public void makeException(Graph g1, Graph g2) {
+        //for now same as sequence
+        makeSequence(g1, g2);        
+    }
 
     public void makeOption(Graph g) {
         g.l = new Node(this, NodeType.OPT, g.l);
@@ -815,15 +811,11 @@ public class Grammar {
         out.println();
     }
 
-    // starts to draw the rule at the given symbol s
+    public void makePredicate(Graph g1, Graph g2) {
+        //for now, same as a sequence
+        makeSequence(g1, g2);
+    }    
 
-    /*
-     * compare two graphs on the basis of structure and value if untilIter is
-     * set, n1 and n2 are treated in a different way: the graph n1 to the iter
-     * node is compared to the iter subnode params: n1 must be the node before
-     * iter if untilIter==true params: n2 must be the first subnode of iter if
-     * untilIter==true
-     */
 }
 
 // End Grammar.java

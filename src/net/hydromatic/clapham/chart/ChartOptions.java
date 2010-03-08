@@ -36,6 +36,11 @@ package net.hydromatic.clapham.chart;
  * @version $Id: $
  */
 public interface ChartOptions {
+    
+    public enum ChartOrder {
+        LEFT_TO_RIGHT,
+        RIGHT_TO_LEFT,
+    }
     /**
      * The default arc size
      */
@@ -162,7 +167,7 @@ public interface ChartOptions {
     void withInitialLocation(int x, int y);
 
     boolean optimize();
-    
+
     /**
      * Set the component gap height
      * 
@@ -180,4 +185,20 @@ public interface ChartOptions {
     ChartOptions withArcSize(int size);
 
     ChartOptions withOptimize(boolean optimize);
+
+    /**
+     * Indicates if the repeated nodes are drawing from left-to-right or
+     * right-to-left.
+     * 
+     * @return True if the repeated nodes are drawing from right-to-left
+     */
+    ChartOrder iterationOrder();
+    
+    /**
+     * Set the drawing order for repeated nodes
+     * @param rightToLeft
+     * 
+     * @return
+     */
+    ChartOptions withIterationOrder(ChartOrder order);
 }

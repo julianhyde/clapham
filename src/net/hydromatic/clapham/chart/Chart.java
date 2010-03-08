@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 
 import net.hydromatic.clapham.graph.Node;
+import net.hydromatic.clapham.graph.NodeType;
 
 /**
  * <p>The main class for drawing. This class contains all the basic drawing
@@ -94,7 +95,7 @@ public interface Chart {
 	 */
 	void setOptions(ChartOptions options);
 
-	void drawString(String text, int x, int y);
+	void drawString(NodeType nodeType, String text, int x, int y);
 
 	void drawRectangle(int x, int y, int width, int height);
 

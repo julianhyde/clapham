@@ -35,6 +35,7 @@ import java.util.List;
 
 import net.hydromatic.clapham.chart.Chart;
 import net.hydromatic.clapham.chart.ChartOptions;
+import net.hydromatic.clapham.chart.ChartOptions.ChartOrder;
 
 /**
  * TODO:
@@ -107,9 +108,9 @@ public class Node {
 
     public void unparse(StringBuffer buf) {
         switch (typ) {
+        case EXCEPTION:
+        case PREDICATE:
         case TERM:
-            buf.append('\'').append(sym.name).append('\'');
-            break;
         case NONTERM:
             buf.append('<').append(sym.name).append('>');
             break;
@@ -209,30 +210,39 @@ public class Node {
         Size maxTotalSize = new Size(0, 0);
         while (n != null && samelevel) {
             switch (n.typ) {
+            case PREDICATE:
+            case EXCEPTION:
             case TERM:
             case NONTERM:
                 n.size.setHeight(
                     options.fontHeight() + options.symbolGapHeight() * 2
                     + options.componentGapHeight());
                 n.size.setWidth(options.stringWidth(n.sym.name) + options.symbolGapWidth() * 2);
-                if (n.typ == NodeType.TERM) {
+                if (n.typ.matches(NodeType.TERM, 
+                        NodeType.EXCEPTION, 
+                        NodeType.PREDICATE)) {
                     n.size.maxWidth(options.arcSize());
                 }
+
                 if (!n.up && n.next != null && n.next.typ == NodeType.WRAP
                         && n.next.size.getHeight() == 0)
                 {
                     if (!n.next.up
                             && n.next.next != null
-                            && (n.next.next.typ == NodeType.TERM
-                                || n.next.next.typ == NodeType.NONTERM))
+                            && (n.next.next.typ.matches(NodeType.TERM, 
+                                                        NodeType.NONTERM, 
+                                                        NodeType.EXCEPTION,
+                                                        NodeType.PREDICATE)))
                     {
                         s.incWidth(options.componentGapWidth() / 2);
                     }
                 }
                 if (!n.up
                         && n.next != null
-                        && (n.next.typ == NodeType.TERM
-                            || n.next.typ == NodeType.NONTERM))
+                        && (n.next.typ.matches(NodeType.TERM,
+                                               NodeType.NONTERM,
+                                               NodeType.EXCEPTION,
+                                               NodeType.PREDICATE)))
                 {
                     s.incWidth(options.componentGapWidth() / 2);
                 }
@@ -271,9 +281,9 @@ public class Node {
                     n.size.incHeight(
                         options.fontHeight() * 3 / 2
                         + options.componentGapHeight());
-                } else {
-                    n.size.incHeight(options.componentGapHeight() / 2);
-                }
+                } 
+                n.size.incHeight(options.componentGapHeight() / 2);
+                
                 n.size.incWidth(options.componentGapWidth() * 2);
                 break;
             case ALT: {
@@ -341,12 +351,14 @@ public class Node {
         boolean samelevel = true; // next node in same level?
         while (n != null && samelevel) {
             int tmpHeight = 0;
-            if (n.typ == NodeType.NONTERM || n.typ == NodeType.TERM) {
+            if (n.typ.matches(NodeType.TERM, NodeType.NONTERM, NodeType.EXCEPTION)) {
                 tmpHeight = n.size.getHeight();
             } else if (n.typ == NodeType.ITER) {
                 tmpHeight = n.sub.calcHeight(options);
             } else if (n.typ == NodeType.OPT) {
                 tmpHeight = n.sub.calcHeight(options);
+            } else if (n.typ == NodeType.PREDICATE) {
+                tmpHeight = n.size.getHeight();
             } else if (n.typ == NodeType.RERUN) {
                 tmpHeight = n.sub.calcHeight(options);
             } else if (n.typ == NodeType.ALT) {
@@ -377,7 +389,7 @@ public class Node {
         int realHeight = calcHeight(options);
         boolean samelevel = true; // next node in same level?
         while (n != null && samelevel) {
-            if (n.typ == NodeType.NONTERM || n.typ == NodeType.TERM) {
+            if (n.typ.matches(NodeType.NONTERM, NodeType.TERM, NodeType.EXCEPTION)) {
                 n.posLine.y = posBegin + realHeight / 2;
                 n.posBegin.y = n.posLine.y
                         - (n.size.getHeight() - options.componentGapHeight()) / 2;
@@ -396,6 +408,12 @@ public class Node {
                 n.posBegin.y = posBegin;
                 n.posEnd.y = posBegin + n.size.getHeight();
                 n.sub.calcPos(options, n.posBegin.y, inverse);
+            } else if (n.typ == NodeType.PREDICATE) {
+                n.posLine.y = posBegin + realHeight / 2;
+                n.posBegin.y = n.posLine.y - n.size.getHeight() / 2 
+                            - options.componentGapHeight() / 2 +1;
+                n.posEnd.y = n.posLine.y;
+                
             } else if (n.typ == NodeType.RERUN) {
                 n.posLine.y = posBegin + realHeight / 2;
                 n.posBegin.y = posBegin;
@@ -458,8 +476,10 @@ public class Node {
         ChartOptions options = chart.getOptions();
         while (n != null && samelevel) {
             switch (n.typ) {
+            case EXCEPTION:
             case TERM:
             case NONTERM:
+            case PREDICATE:
                 if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
@@ -468,8 +488,8 @@ public class Node {
                         n.size.getWidth(),
                         n.size.getHeight());
                 }
-                n.textBox = new TextBox(chart, n.sym.name);
-                if (n.typ == NodeType.TERM) {
+                n.textBox = new TextBox(chart, n.sym.name, n.typ);
+                if (n.typ.matches(NodeType.TERM, NodeType.EXCEPTION)) {
                     // the quarter Arcs
                     final int arcSize = (n.size.getHeight() - options
                             .componentGapHeight()) / 2;
@@ -511,6 +531,22 @@ public class Node {
                         n.posLine.y + quarterHeight + 1,
                         p.x + n.size.getWidth(),
                         n.posLine.y - quarterHeight - 1);
+                } else if(n.typ == NodeType.PREDICATE) {
+                 // the quarter Arcs
+                    final int arcSize = (n.size.getHeight() - options
+                            .componentGapHeight()) / 2;
+
+                    n.textBox.drawAtCenter(
+                        p.x, n.posBegin.y,
+                        n.size.getWidth() - arcSize,
+                        n.size.getHeight() - options.componentGapHeight());
+
+                    // the long horizontal lines
+                    chart.drawLine(
+                        p.x,
+                        n.posEnd.y,
+                        p.x + n.size.getWidth(),
+                        n.posEnd.y);
                 } else {
                     n.posBegin.x = p.x;
                     n.posEnd.x = p.x + n.size.getWidth();
@@ -541,18 +577,22 @@ public class Node {
                            - options.componentGapHeight()
                            - options.fontHeight()) / 2);
                 }
+                if(n.typ != NodeType.PREDICATE) {
                 chart.drawArrow(
                     p.x,
                     n.posLine.y,
                     p.x,
                     n.posLine.y,
                     Chart.ArrowDirection.RIGHT);
+                }
                 p.x += n.size.getWidth();
                 // draw lines between t and nt nodes
                 if (!n.up
                     && n.next != null
-                    && (n.next.typ == NodeType.TERM
-                        || n.next.typ == NodeType.NONTERM))
+                        && (n.next.typ.matches(NodeType.TERM,
+                                               NodeType.NONTERM,
+                                               NodeType.EXCEPTION,
+                                               NodeType.PREDICATE)))
                 {
                     chart.drawArrow(
                         p.x,
@@ -611,6 +651,16 @@ public class Node {
                     n.posLine.y,
                     p.x + n.size.getWidth() - options.componentGapWidth(),
                     n.posLine.y);
+//                chart.drawArrow(
+//                    p.x
+//                    - options.componentGapWidth() / 4
+//                    + n.size.getWidth() + options.arrowSize(), 
+//                    n.posLine.y, 
+//                    p.x
+//                    - options.componentGapWidth() / 4
+//                    + n.size.getWidth() + options.arrowSize(),
+//                    n.posLine.y, 
+//                    ArrowDirection.RIGHT);
                 // the quarter Arcs
                 chart.drawArcCorner(
                     p.x
@@ -938,7 +988,165 @@ public class Node {
                         n.size.getWidth(),
                         n.size.getHeight());
                 }
+                if(options.iterationOrder() == ChartOrder.LEFT_TO_RIGHT) {
+                 // the quarter Arcs
+                    chart.drawArcCorner(p.x, n.posLine.y, 270);
 
+                    chart.drawArcCorner(
+                        p.x
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
+                        n.sub.posLine.y
+                        - options.arcSize(),
+                        90);
+                    
+                    chart.drawArcCorner(
+                        p.x
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() * 3 / 2
+                        + n.size.getWidth(),
+                        n.sub.posLine.y - options.arcSize(),
+                        0);
+                    
+                    chart.drawArcCorner(
+                            p.x
+                            - options.componentGapWidth() / 4
+                            - options.arcSize() / 2
+                            + n.size.getWidth(),
+                            n.posLine.y,
+                            180);
+
+                    //the two short vertical lines between the quarter Arcs
+                    chart.drawLine(
+                        p.x
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
+                        n.posLine.y
+                        + options.arcSize() / 2,
+                        p.x
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
+                        n.sub.posLine.y
+                        - options.arcSize() / 2
+                        + 1);
+                    chart.drawLine(
+                        p.x
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2
+                        + n.size.getWidth(),
+                        n.posLine.y
+                        + options.arcSize() / 2,
+                        p.x
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2
+                        + n.size.getWidth(),
+                        n.sub.posLine.y
+                        - options.arcSize() / 2
+                        + 1);
+                    // the two short horizontal lines between the quater Arcs and
+                    // the components
+                    chart.drawLine(
+                        p.x
+                        + options.componentGapWidth() / 4
+                        + options.arcSize()
+                        - 1,
+                        n.sub.posLine.y,
+                        p.x
+                        + options.componentGapWidth(),
+                        n.sub.posLine.y);
+                    chart.drawLine(
+                        p.x
+                        - options.componentGapWidth()
+                        + n.size.getWidth(),
+                        n.sub.posLine.y,
+                        p.x
+                        + n.size.getWidth()
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() + 1,
+                        n.sub.posLine.y);
+                    // the long horizontal line in the middle
+                    chart.drawLine(
+                        p.x,
+                        n.posLine.y,
+                        p.x + n.size.getWidth(),
+                        n.posLine.y);
+
+                    n.sub.drawComponents(
+                        chart,
+                        new Point(
+                                p.x
+                                + options.componentGapWidth() / 2
+                                + options.arcSize(),
+                            0),
+                        n.size);
+                    
+                    // the quarter Arcs                    
+                    chart.drawArcCorner(
+                        p.x
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
+                        n.sub.posLine.y,
+                        180);
+
+                    chart.drawArcCorner(
+                        p.x
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() * 3 / 2
+                        + n.size.getWidth(),
+                        n.sub.posLine.y,
+                        270);
+                        
+                    chart.drawArcCorner(
+                        p.x
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
+                        n.posLine.y + n.size.getHeight() - options.arcSize(),
+                        90);
+
+                    chart.drawArcCorner(
+                        p.x
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() * 3 / 2
+                        + n.size.getWidth(),
+                        n.posLine.y + n.size.getHeight() - options.arcSize(),
+                        0);
+                    // the short vertical lines between the quarter Arcs
+                    chart.drawLine(
+                        p.x
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
+                        n.sub.posLine.y
+                        + options.arcSize() / 2,
+                        p.x
+                        + options.componentGapWidth() / 4
+                        + options.arcSize() / 2,
+                        n.posLine.y + n.size.getHeight() - options.arcSize()/2);
+                    chart.drawLine(
+                        p.x
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2
+                        + n.size.getWidth(),
+                        n.sub.posLine.y
+                        + options.arcSize() / 2,
+                        p.x
+                        - options.componentGapWidth() / 4
+                        - options.arcSize() / 2
+                        + n.size.getWidth(),
+                        n.posLine.y + n.size.getHeight() - options.arcSize()/2
+                        );
+                    // the the long horizontal line between the quarter Arcs
+                    chart.drawLine(
+                        p.x
+                        + options.componentGapWidth() / 4
+                        + options.arcSize(),
+                        n.posLine.y + n.size.getHeight(),
+                        p.x
+                        - options.componentGapWidth() / 4
+                        - options.arcSize()
+                        + n.size.getWidth()
+                        + 1,
+                        n.posLine.y + n.size.getHeight());
+                } else {
                 // the quarter Arcs
                 chart.drawArcCorner(
                     p.x
@@ -1028,6 +1236,7 @@ public class Node {
                         p.x - options.componentGapWidth() + n.size.getWidth(),
                         0),
                     n.size);
+                }
                 p.x += n.size.getWidth();
                 break;
             case WRAP:
@@ -1257,7 +1466,7 @@ public class Node {
         ChartOptions options = chart.getOptions();
         while (n != null && samelevel) {
             p.x -= n.size.getWidth();
-            if (n.typ == NodeType.TERM || n.typ == NodeType.NONTERM) {
+            if (n.typ.matches(NodeType.TERM, NodeType.NONTERM, NodeType.EXCEPTION, NodeType.PREDICATE)) {
                 if (options.showBorders()) {
                     chart.drawRectangle(
                         p.x,
@@ -1266,7 +1475,7 @@ public class Node {
                         n.size.getWidth(),
                         n.size.getHeight());
                 }
-                if (n.typ == NodeType.TERM) {
+                if (n.typ.matches(NodeType.TERM, NodeType.EXCEPTION)) {
                     // the quarter Arcs
                     final int arcSize =
                         (n.size.getHeight() - options.componentGapHeight()) / 2;
@@ -1341,6 +1550,13 @@ public class Node {
                         n.posLine.y
                         - (n.size.getHeight() - options.componentGapHeight()) / 4
                         - 1);
+                } else if(n.typ == NodeType.PREDICATE) {
+                    chart.drawLine(
+                            p.x,
+                            n.posEnd.y,
+                            p.x
+                            + n.size.getWidth(),
+                            n.posEnd.y);
                 } else {
                     n.posBegin.x = p.x;
                     n.posEnd.x = p.x + n.size.getWidth();
@@ -1350,37 +1566,28 @@ public class Node {
                         n.size.getWidth(),
                         n.size.getHeight() - options.componentGapHeight());
                 }
-                // StringFormat drawFormat = new StringFormat();
-                // drawFormat.setAlignment(StringAlignment.Center);
-                // drawFormat.setLineAlignment(StringAlignment.Center);
-                // DrawString(
-                //     n.sym.name,
-                //     charFont,
-                //     charColor,
-                //     new Rectangle(
-                //         (int)p.x,
-                //         (int)n.posBegin.y,
-                //         n.size.getWidth(),
-                //         n.size.getHeight() - componentGapHeight - 2),
-                //     drawFormat);
-                TextBox textBox = new TextBox(chart, n.sym.name);
+
+                TextBox textBox = new TextBox(chart, n.sym.name, n.typ);
                 textBox.drawAtCenter(
                     p.x,
                     n.posBegin.y,
                     n.size.getWidth(),
                     n.size.getHeight() - options.componentGapHeight());
 
-                chart.drawArrow(
-                    p.x + n.size.getWidth(),
-                    n.posLine.y,
-                    p.x + n.size.getWidth(),
-                    n.posLine.y,
-                    Chart.ArrowDirection.LEFT);
+                if(n.typ != NodeType.PREDICATE) {
+                    chart.drawArrow(
+                        p.x + n.size.getWidth(),
+                        n.posLine.y,
+                        p.x + n.size.getWidth(),
+                        n.posLine.y,
+                        Chart.ArrowDirection.LEFT);
+                }
 
                 if (!n.up
                     && n.next != null
-                    && (n.next.typ == NodeType.TERM
-                        || n.next.typ == NodeType.NONTERM))
+                    && (n.next.typ.matches(NodeType.TERM,
+                                            NodeType.NONTERM,
+                                            NodeType.EXCEPTION)))
                 {
                     chart.drawArrow(
                         p.x,
@@ -1398,8 +1605,9 @@ public class Node {
                 {
                     if (!n.next.up
                         && n.next.next != null
-                        && (n.next.next.typ == NodeType.TERM
-                            || n.next.next.typ == NodeType.NONTERM))
+                            && (n.next.next.typ.matches(NodeType.TERM, 
+                                                    NodeType.NONTERM,
+                                                    NodeType.EXCEPTION)))
                     {
                         chart.drawArrow(
                             p.x,
@@ -1424,6 +1632,7 @@ public class Node {
                     n.posLine.y,
                     p.x + n.size.getWidth(),
                     n.posLine.y);
+            } else if(n.typ == NodeType.PREDICATE) {
             } else if (n.typ == NodeType.OPT) {
                 if (options.showBorders()) {
                     chart.drawRectangle(
@@ -1958,6 +2167,9 @@ public class Node {
 
     public void visitChildren(Chart.NodeVisitor visitor) {
         switch (typ) {
+        case WRAP:
+        case PREDICATE:
+        case EXCEPTION:
         case TERM:
         case NONTERM:
         case EPS:
@@ -1973,7 +2185,7 @@ public class Node {
                 }
             break;
         case OPT:
-                sub.accept(visitor);
+            sub.accept(visitor);
             break;
         case RERUN:
 			if (itergraph != null) {

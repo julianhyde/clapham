@@ -66,15 +66,15 @@ public class AlternateNode extends BaseEbnfNode {
     }
     
     public String toEbnf(EbnfDecorator decorator) {
-    	StringBuilder buff = new StringBuilder();
+    	StringBuilder buff = new StringBuilder().append("(");
     	final String SEPARATOR = " | ";
     	for(EbnfNode n: list) {
     		buff.append(n.toEbnf(decorator)).append(SEPARATOR);
     	}
-    	if(buff.length() > 0) {
-    		buff.setLength(buff.length() - SEPARATOR.length());
-    	}
-    	return buff.toString();
+    	
+  		buff.setLength(buff.length() - SEPARATOR.length());
+  		
+    	return buff.append(")").toString();
     }
 }
 

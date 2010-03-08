@@ -42,6 +42,7 @@ import net.hydromatic.clapham.chart.AbstractChart;
 import net.hydromatic.clapham.chart.AbstractChartOptions;
 import net.hydromatic.clapham.chart.ChartOptions;
 import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.NodeType;
 import net.hydromatic.clapham.graph.Size;
 
 /**
@@ -113,7 +114,7 @@ public class Java2DChart extends AbstractChart {
         return createOptions(defaultCharFont);
     }
 
-    protected void internalDrawString(String text, int x, int y) {
+    protected void internalDrawString(NodeType nodeType, String text, int x, int y) {
         g.drawString(text, x, y);
     }
 

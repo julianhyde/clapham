@@ -28,6 +28,8 @@
 */
 package net.hydromatic.clapham.graph;
 
+import java.util.EnumSet;
+
 /**
  * Constants for node kinds.
  *
@@ -38,12 +40,20 @@ package net.hydromatic.clapham.graph;
 public enum NodeType {
     TERM,  // terminal symbol
     NONTERM,  // nonterminal symbol
+    EXCEPTION,  // exception: -
     EPS,  // empty
     ALT,  // alternative: |
     ITER,  // iteration: { }
     OPT,  // option: [ ]
     RERUN,  // the optimization of: a {a} or a {b a}
-    WRAP  // forces line break if found in the outer structure
+    WRAP,  // forces line break if found in the outer structure
+    PREDICATE // a conditional rule
+    ;
+    
+    public boolean matches(NodeType type, NodeType...tail) {
+        EnumSet<NodeType> set = EnumSet.of(type, tail);
+        return set.contains(this);   
+    }
 }
 
 // End NodeType.java

@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 
 import net.hydromatic.clapham.graph.Grammar;
+import net.hydromatic.clapham.graph.NodeType;
 import net.hydromatic.clapham.graph.Symbol;
 
 public abstract class AbstractChart implements Chart, ChartOptions {
@@ -42,14 +43,14 @@ public abstract class AbstractChart implements Chart, ChartOptions {
         private AbstractChart owner;
 
         private int xMax;
-        
+
         private int yMax;
-        
+
         public SizeChart(AbstractChart owner) {
             super(owner.grammar);
             this.owner = owner;
         }
-        
+
         @Override
         protected void expandBounds(int x, int y) {
             xMax = Math.max(xMax, x);
@@ -75,7 +76,7 @@ public abstract class AbstractChart implements Chart, ChartOptions {
         }
 
         @Override
-        protected void internalDrawString(String text, int x, int y) {
+        protected void internalDrawString(NodeType nodeType, String text, int x, int y) {
         }
 
         public ChartOptions createOptions() {
@@ -157,11 +158,11 @@ public abstract class AbstractChart implements Chart, ChartOptions {
                                 : startAngle, (int) arcAngle);
     }
 
-    public final void drawString(String text, int x, int y) {
-        internalDrawString(text, x, y);
+    public final void drawString(NodeType nodeType, String text, int x, int y) {
+        internalDrawString(nodeType, text, x, y);
     }
 
-    protected abstract void internalDrawString(String text, int x, int y);
+    protected abstract void internalDrawString(NodeType nodeType, String text, int x, int y);
 
     public final void drawArrow(int x1, int y1, int x2, int y2,
             Chart.ArrowDirection direction) {
@@ -229,7 +230,7 @@ public abstract class AbstractChart implements Chart, ChartOptions {
             int startAngle,
             int arcAngle);
 
-    protected void expandBounds(int x, int y) {        
+    protected void expandBounds(int x, int y) {
     }
 
     public Dimension size(String symbolName) {
@@ -322,5 +323,14 @@ public abstract class AbstractChart implements Chart, ChartOptions {
     public ChartOptions withOptimize(boolean optimize) {
         getOptions().withOptimize(optimize);
         return getOptions();
+    }
+
+    public ChartOptions withIterationOrder(ChartOrder rightToLeft) {
+        getOptions().withIterationOrder(rightToLeft);
+        return getOptions();
+    }
+    
+    public ChartOrder iterationOrder() {
+        return getOptions().iterationOrder();
     }
 }

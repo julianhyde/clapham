@@ -41,12 +41,14 @@ import net.hydromatic.clapham.chart.Chart;
 public class TextBox {
     private final Chart chart;
     private final String text;
-    final int width;
-    final int height;
+    private final int width;
+    private final int height;
+    private final NodeType nodeType;
 
-    TextBox(Chart chart, String text) {
+    TextBox(Chart chart, String text, NodeType nodeType) {
         this.chart = chart;
         this.text = text;
+        this.nodeType = nodeType;
         this.width = chart.getOptions().stringWidth(text);
         this.height = chart.getOptions().fontHeight();
     }
@@ -59,8 +61,8 @@ public class TextBox {
         int y =
             y1
             + Math.abs(height - this.height) / 2
-            +  + chart.fontHeightCorrectness();
-        chart.drawString(text, x, y);
+            + chart.fontHeightCorrectness();
+        chart.drawString(nodeType, text, x, y);
     }
 }
 

@@ -53,7 +53,12 @@ public abstract class BaseEbnfNode implements EbnfNode {
 
 	protected String toEbnf(EbnfDecorator decorator, EbnfNode node, String operator) {
 		StringBuilder buff = new StringBuilder();
-		boolean parenthesis = node instanceof SequenceNode;
+		boolean parenthesis = false;
+		
+		if(node instanceof SequenceNode) {
+		    parenthesis = ((SequenceNode)node).list.size() > 1;
+		}
+		
 		buff.append(node.toEbnf(decorator));
 		if (parenthesis) {
 			buff.insert(0, "(").append(")");
