@@ -39,6 +39,6 @@ public class PredicateNode extends BaseEbnfNode {
     }
 
     public String toEbnf(EbnfDecorator decorator) {
-        return s;
+        return s + " " + node.toEbnf(decorator);
     }
 }
