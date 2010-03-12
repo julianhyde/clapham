@@ -37,7 +37,8 @@ package net.hydromatic.clapham.chart;
  */
 public interface ChartOptions {
     
-    public enum ChartOrder {
+    public enum ChartLayout {
+    	BEST,
         LEFT_TO_RIGHT,
         RIGHT_TO_LEFT,
     }
@@ -192,7 +193,7 @@ public interface ChartOptions {
      * 
      * @return True if the repeated nodes are drawing from right-to-left
      */
-    ChartOrder iterationOrder();
+    ChartLayout iterationLayout();
     
     /**
      * Set the drawing order for repeated nodes
@@ -200,5 +201,5 @@ public interface ChartOptions {
      * 
      * @return
      */
-    ChartOptions withIterationOrder(ChartOrder order);
+    ChartOptions withIterationOrder(ChartLayout order);
 }

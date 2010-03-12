@@ -325,12 +325,12 @@ public abstract class AbstractChart implements Chart, ChartOptions {
         return getOptions();
     }
 
-    public ChartOptions withIterationOrder(ChartOrder rightToLeft) {
+    public ChartOptions withIterationOrder(ChartLayout rightToLeft) {
         getOptions().withIterationOrder(rightToLeft);
         return getOptions();
     }
     
-    public ChartOrder iterationOrder() {
-        return getOptions().iterationOrder();
+    public ChartLayout iterationLayout() {
+        return getOptions().iterationLayout();
     }
 }

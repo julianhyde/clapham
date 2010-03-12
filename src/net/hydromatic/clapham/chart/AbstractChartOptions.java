@@ -55,7 +55,7 @@ public abstract class AbstractChartOptions implements ChartOptions {
 
     private boolean optimize;
 
-    private ChartOrder iterationOrder;
+    private ChartLayout iterationLayout;
 
     public AbstractChartOptions() {
         this.arcSize = ARC_SIZE;
@@ -68,7 +68,7 @@ public abstract class AbstractChartOptions implements ChartOptions {
         this.optimize = true;
         this.symbolGapHeight = SYMBOL_GAP_HEIGHT;
         this.symbolGapWidth = SYMBOL_GAP_WIDTH;
-        this.iterationOrder = ChartOrder.LEFT_TO_RIGHT;
+        this.iterationLayout = ChartLayout.BEST;
     }
 
     public boolean optimize() {
@@ -144,14 +144,14 @@ public abstract class AbstractChartOptions implements ChartOptions {
         return this;
     }
 
-    public ChartOptions withIterationOrder(ChartOrder order) {
+    public ChartOptions withIterationOrder(ChartLayout order) {
         if (order == null)
             throw new IllegalArgumentException("order can not be null");
-        this.iterationOrder = order;
+        this.iterationLayout = order;
         return this;
     }
 
-    public ChartOrder iterationOrder() {
-        return iterationOrder;
+    public ChartLayout iterationLayout() {
+        return iterationLayout;
     }
 }
