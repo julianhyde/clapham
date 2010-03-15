@@ -45,18 +45,7 @@ import net.hydromatic.clapham.chart.ChartOptions.ChartLayout;
  * @since Jul 30, 2008
  */
 public class Node {
-
-	private static class TerminalOrNonTerminalCounter implements Chart.NodeVisitor {
-		private int count;
-		
-		public void visit(Node node) {
-			if(node.typ.matches(NodeType.TERM, NodeType.NONTERM)) {
-				count++;
-			}
-			node.visitChildren(this);
-		}
-	}
-	
+    
     public final int n; // node number
     public NodeType typ; // t, nt, eps, alt, iter, opt, rerun
     public Node next; // to successor node
@@ -742,10 +731,13 @@ public class Node {
 		}
 		ChartLayout layout = options.iterationLayout();
 		if(options.iterationLayout() == ChartLayout.BEST) {
-			TerminalOrNonTerminalCounter counter = new TerminalOrNonTerminalCounter();
-			n.accept(counter);
-			layout = counter.count > 1? ChartLayout.LEFT_TO_RIGHT: 
-					ChartLayout.RIGHT_TO_LEFT;
+			if(n.sub.typ.matches(NodeType.ALT)) {
+				layout = ChartLayout.LEFT_TO_RIGHT;
+			} else {
+				int count = countChildren(n.sub);
+				layout = count > 1? ChartLayout.LEFT_TO_RIGHT: 
+									ChartLayout.RIGHT_TO_LEFT;
+			}
 		}
 		
 		if(layout == ChartLayout.LEFT_TO_RIGHT) {
@@ -1004,6 +996,19 @@ public class Node {
 		p.x += n.size.getWidth();
 	}
 
+	private int countChildren(Node node) {
+	    int count = 0;
+	    while (node != null) {
+            if (node.up) {
+                node = null;
+            } else {
+                node = node.next;
+                count++;
+            }
+        }
+	    return count;
+	}
+	
 	private void drawRerun(Chart chart, Point p, Node n) {
 		ChartOptions options = chart.getOptions();
 		if (n.itergraph == null) {

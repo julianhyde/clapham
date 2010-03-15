@@ -60,8 +60,8 @@ public interface Chart {
 	/**
 	 * 
 	 * This interface allow to traverse all the nodes
-	 * 
-	 */
+	 * TODO: review this
+	 */	
 	interface NodeVisitor {
 		void visit(Node node);
 	}
