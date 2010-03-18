@@ -202,4 +202,8 @@ public interface ChartOptions {
      * @return
      */
     ChartOptions withIterationOrder(ChartLayout order);
+    
+    boolean showSymbolName();
+    
+    ChartOptions withSymbolName(boolean show);
 }

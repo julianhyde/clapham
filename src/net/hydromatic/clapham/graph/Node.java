@@ -529,6 +529,7 @@ public class Node {
     }
 
 	private void drawAlt(Chart chart, Point p, Node n) {
+		drawing(n);
 		ChartOptions options = chart.getOptions();
 		if (options.showBorders()) {
 		    chart.drawRectangle(
@@ -635,7 +636,24 @@ public class Node {
 		p.x += n.altSize.getWidth();
 	}
 
+	private void drawing(Node n) {
+		drawing(n, false);		
+	}
+
+	private void drawing(Node n, boolean inverse) {
+		if(Grammar.TRACE) {
+			String label = n.sym!=null?n.sym.name: n.typ.name();
+			label+= "(" + n.n + ")";
+			if(inverse) {
+				label+="-i";
+			}
+			System.out.println("DRAWING: " + label);
+		}
+	}
+
 	private void drawWrap(Chart chart, Point p, Node n) {
+		drawing(n);
+		
 		ChartOptions options = chart.getOptions();
 		if (n.size.getHeight() != 0 && n.next != null) {
 		    // the short horizontal line after the first component
@@ -721,6 +739,7 @@ public class Node {
 	}
 
 	private void drawIteration(Chart chart, Point p, Node n) {
+		drawing(n);
 		ChartOptions options = chart.getOptions();
 		if (options.showBorders()) {
 		    chart.drawRectangle(
@@ -1010,7 +1029,9 @@ public class Node {
 	}
 	
 	private void drawRerun(Chart chart, Point p, Node n) {
+		drawing(n);
 		ChartOptions options = chart.getOptions();
+		
 		if (n.itergraph == null) {
 		    if (options.showBorders()) {
 		        chart.drawRectangle(
@@ -1255,6 +1276,7 @@ public class Node {
 	}
 
 	private void drawOption(Chart chart, Point p, Node n) {
+		drawing(n);
 		ChartOptions options = chart.getOptions();
 		if (options.showBorders()) {
 		    chart.drawRectangle(
@@ -1275,16 +1297,7 @@ public class Node {
 		    n.posLine.y,
 		    p.x + n.size.getWidth() - options.componentGapWidth(),
 		    n.posLine.y);
-//        chart.drawArrow(
-//            p.x
-//            - options.componentGapWidth() / 4
-//            + n.size.getWidth() + options.arrowSize(), 
-//            n.posLine.y, 
-//            p.x
-//            - options.componentGapWidth() / 4
-//            + n.size.getWidth() + options.arrowSize(),
-//            n.posLine.y, 
-//            ArrowDirection.RIGHT);
+
 		// the quarter Arcs
 		chart.drawArcCorner(
 		    p.x
@@ -1343,18 +1356,18 @@ public class Node {
 		    - options.arcSize() / 2
 		    - options.componentGapHeight() / 2 + 1);
 		// the the long horizontal line between the quarter Arcs
-		chart.drawLine(
-		    p.x
-		    + options.componentGapWidth() / 4
-		    + options.arcSize(),
-		    n.posEnd.y
-		    - options.componentGapHeight() / 2,
-		    p.x
-		    - options.componentGapWidth() / 4
-		    - options.arcSize()
-		    + n.size.getWidth()
-		    + 1,
-		    n.posEnd.y - options.componentGapHeight() / 2);
+//		chart.drawLine(
+//		    p.x
+//		    + options.componentGapWidth() / 4
+//		    + options.arcSize(),
+//		    n.posEnd.y
+//		    - options.componentGapHeight() / 2,
+//		    p.x
+//		    - options.componentGapWidth() / 4
+//		    - options.arcSize()
+//		    + n.size.getWidth()
+//		    + 1,
+//		    n.posEnd.y - options.componentGapHeight() / 2);
 
 		n.sub.drawComponents(
 		    chart,
@@ -1364,6 +1377,7 @@ public class Node {
 	}
 
 	private void drawEpsilon(Chart chart, Point p, Node n) {
+		drawing(n);
 		ChartOptions options = chart.getOptions();
 		if (options.showBorders()) {
 		    chart.drawRectangle(
@@ -1381,6 +1395,7 @@ public class Node {
 	}
 
 	private Point drawDefault(Chart chart, Point p, Node n) {
+		drawing(n);
 		ChartOptions options = chart.getOptions();
 		if (options.showBorders()) {
 		    chart.drawRectangle(
@@ -1552,6 +1567,7 @@ public class Node {
     }
 
 	private void drawAltInverse(Chart chart, Point p, Node n, Point p1) {
+		drawing(n, true);
 		ChartOptions options = chart.getOptions();
 		p.x -= n.altSize.getWidth() - n.size.getWidth();
 		if (options.showBorders()) {
@@ -1660,6 +1676,7 @@ public class Node {
 	}
 
 	private void drawIterationReverse(Chart chart, Point p, Node n, Point p1) {
+		drawing(n, true);
 		ChartOptions options = chart.getOptions();
 		if (options.showBorders()) {
 		    chart.drawRectangle(
@@ -1759,6 +1776,8 @@ public class Node {
 	}
 
 	private void drawRerunInverse(Chart chart, Point p, Node n, Point p1) {
+		drawing(n, true);
+		
 		ChartOptions options = chart.getOptions();
 		if(n.itergraph == null) {
 			if (options.showBorders()) {
@@ -1986,6 +2005,7 @@ public class Node {
 	}
 
 	private void drawOptionInverse(Chart chart, Point p, Node n, Point p1) {
+		drawing(n, true);
 		ChartOptions options = chart.getOptions();
 		if (options.showBorders()) {
 		    chart.drawRectangle(
@@ -2086,6 +2106,7 @@ public class Node {
 	}
 
 	private void drawDefaultInverse(Chart chart, Point p, Node n) {
+		drawing(n, true);
 		ChartOptions options = chart.getOptions();
 		if (options.showBorders()) {
 		    chart.drawRectangle(

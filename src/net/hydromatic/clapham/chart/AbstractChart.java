@@ -38,299 +38,310 @@ import net.hydromatic.clapham.graph.Symbol;
 
 public abstract class AbstractChart implements Chart, ChartOptions {
 
-    private static class SizeChart extends AbstractChart {
+	private static class SizeChart extends AbstractChart {
 
-        private AbstractChart owner;
+		private AbstractChart owner;
 
-        private int xMax;
+		private int xMax;
 
-        private int yMax;
+		private int yMax;
 
-        public SizeChart(AbstractChart owner) {
-            super(owner.grammar);
-            this.owner = owner;
-        }
+		public SizeChart(AbstractChart owner) {
+			super(owner.grammar);
+			this.owner = owner;
+		}
 
-        @Override
-        protected void expandBounds(int x, int y) {
-            xMax = Math.max(xMax, x);
-            yMax = Math.max(yMax, y);
-        }
+		@Override
+		protected void expandBounds(int x, int y) {
+			xMax = Math.max(xMax, x);
+			yMax = Math.max(yMax, y);
+		}
 
-        @Override
-        protected void internalDrawArc(int x, int y, int width, int height,
-                int startAngle, int arcAngle) {
-        }
+		@Override
+		protected void internalDrawArc(int x, int y, int width, int height,
+				int startAngle, int arcAngle) {
+		}
 
-        @Override
-        protected void internalDrawArrow(int x1, int y1, int x2, int y2,
-                int[] xpoints, int[] ypoints) {
-        }
+		@Override
+		protected void internalDrawArrow(int x1, int y1, int x2, int y2,
+				int[] xpoints, int[] ypoints) {
+		}
 
-        @Override
-        protected void internalDrawLine(int x1, int y1, int x2, int y2) {
-        }
+		@Override
+		protected void internalDrawLine(int x1, int y1, int x2, int y2) {
+		}
 
-        @Override
-        protected void internalDrawRectangle(int x, int y, int width, int height) {
-        }
+		@Override
+		protected void internalDrawRectangle(int x, int y, int width, int height) {
+		}
 
-        @Override
-        protected void internalDrawString(NodeType nodeType, String text, int x, int y) {
-        }
+		@Override
+		protected void internalDrawString(NodeType nodeType, String text,
+				int x, int y) {
+		}
 
-        public ChartOptions createOptions() {
-            return null;
-        }
+		public ChartOptions createOptions() {
+			return null;
+		}
 
-        @Override
-        public ChartOptions getOptions() {
-            return owner.getOptions();
-        }
+		@Override
+		public ChartOptions getOptions() {
+			return owner.getOptions();
+		}
 
-        public ChartOptions createOptions(String fontName) {
-            return null;
-        }
+		public ChartOptions createOptions(String fontName) {
+			return null;
+		}
 
-        public void drawAndExport(String symbolName, File outputDirectory)
-                throws IOException {
-        }
+		public void drawAndExport(String symbolName, File outputDirectory)
+				throws IOException {
+		}
 
-        public int fontHeightCorrectness() {
-            return owner.fontHeightCorrectness();
-        }
+		public int fontHeightCorrectness() {
+			return owner.fontHeightCorrectness();
+		}
 
-        public int width() {
-            return xMax + 5;
-        }
+		public int width() {
+			return xMax + 5;
+		}
 
-        public int height() {
-            return yMax + 10;
-        }
+		public int height() {
+			return yMax + 10;
+		}
 
-    }
+	}
 
-    private ChartOptions options;
+	private ChartOptions options;
 
-    protected final Grammar grammar;
+	protected final Grammar grammar;
 
-    public AbstractChart(Grammar grammar) {
-        this.grammar = grammar;
-    }
+	public AbstractChart(Grammar grammar) {
+		this.grammar = grammar;
+	}
 
-    public final void prepare() {
-        for (Symbol s : grammar.nonterminals) {
-            s.graph.graphSize = s.graph.l.calcSize(this);
-            s.graph.l.setWrapSize(this);
-            s.graph.l.calcPos(this, initialY(), false);
-            if (Grammar.TRACE) {
-                System.out.println("\n\n" + s.graph.graphSize.toString());
-            }
-        }
-        if (Grammar.TRACE) {
-            grammar.printNodes(System.out);
-        }
-    }
+	public final void prepare() {
+		for (Symbol s : grammar.nonterminals) {
+			s.graph.graphSize = s.graph.l.calcSize(this);
+			s.graph.l.setWrapSize(this);
+			s.graph.l.calcPos(this, initialY(), false);
+			if (Grammar.TRACE) {
+				System.out.println("\n\n" + s.graph.graphSize.toString());
+			}
+		}
+		if (Grammar.TRACE) {
+			grammar.printNodes(System.out);
+		}
+	}
 
-    public final void draw(String symbolName) {
-        Symbol symbol = symbol(symbolName);
+	public final void draw(String symbolName) {
+		Symbol symbol = symbol(symbolName);
 
-        Point p = new Point(initialX(), initialY() - 30);
+		Point p = new Point(initialX(), initialY() - 30);
 
-        internalDrawLine(initialX() - componentGapWidth() / 4 - arcSize() / 2,
-                symbol.graph.l.posLine.y, initialX(), symbol.graph.l.posLine.y);
+		if (showSymbolName()) {
+			drawString(NodeType.NONTERM, symbolName, 5, initialY()
+					- componentGapHeight() - symbolGapHeight());
+		}
+		
+		grammar.printNodes(System.out);
 
-        symbol.graph.l.drawComponents(this, p, symbol.graph.graphSize);
+		internalDrawLine(initialX() - componentGapWidth() / 4 - arcSize() / 2,
+				symbol.graph.l.posLine.y, initialX(), symbol.graph.l.posLine.y);
 
-    }
+		symbol.graph.l.drawComponents(this, p, symbol.graph.graphSize);
 
-    public final void drawArc(int x, int y, int width, int height,
-            int startAngle,
-            int arcAngle) {
-        expandBounds(x - width, y - height);
-        expandBounds(x + width, y - height);
-        expandBounds(x - width, y + height);
-        expandBounds(x + width, y + height);
+	}
 
-        internalDrawArc(x, y, width, height,
-                startAngle == 180 ? 90 : startAngle == 90 ? 180
-                        : startAngle == 270 ? 0 : startAngle == 0 ? 270
-                                : startAngle, (int) arcAngle);
-    }
+	public final void drawArc(int x, int y, int width, int height,
+			int startAngle, int arcAngle) {
+		expandBounds(x - width, y - height);
+		expandBounds(x + width, y - height);
+		expandBounds(x - width, y + height);
+		expandBounds(x + width, y + height);
 
-    public final void drawString(NodeType nodeType, String text, int x, int y) {
-        internalDrawString(nodeType, text, x, y);
-    }
+		internalDrawArc(x, y, width, height, startAngle == 180 ? 90
+				: startAngle == 90 ? 180 : startAngle == 270 ? 0
+						: startAngle == 0 ? 270 : startAngle, (int) arcAngle);
+	}
 
-    protected abstract void internalDrawString(NodeType nodeType, String text, int x, int y);
+	public final void drawString(NodeType nodeType, String text, int x, int y) {
+		internalDrawString(nodeType, text, x, y);
+	}
 
-    public final void drawArrow(int x1, int y1, int x2, int y2,
-            Chart.ArrowDirection direction) {
-        expandBounds(x1, y1);
-        expandBounds(x2, y2);
-        int[] xpoints = null;
-        int[] ypoints = null;
-        switch (direction) {
-        case RIGHT:
-            xpoints = new int[] { x2, x2 - arrowSize() * 2,
-                    x2 - arrowSize() * 2 };
-            ypoints = new int[] { y2, y2 - arrowSize(),
-                    y2 + arrowSize() };
-            break;
-        case UP:
-            xpoints = new int[] { x2, x2 - arrowSize(), x2 + arrowSize() };
-            ypoints = new int[] { y2, y2 + arrowSize() * 2,
-                    y2 + arrowSize() * 2 };
-            break;
-        case LEFT:
-            xpoints = new int[] { x2, x2 + arrowSize() * 2,
-                    x2 + arrowSize() * 2 };
-            ypoints = new int[] { y2, y2 + arrowSize(),
-                    y2 - arrowSize() };
-            break;
-        case DOWN:
-            xpoints = new int[] { x2, x2 - arrowSize(), x2 + arrowSize() };
-            ypoints = new int[] { y2, y2 - arrowSize() * 2,
-                                    y2 - arrowSize() * 2 };
-            break;
-        }
-        internalDrawArrow(x1, y1, x2, y2, xpoints, ypoints);
-    }
+	protected abstract void internalDrawString(NodeType nodeType, String text,
+			int x, int y);
 
-    protected abstract void internalDrawArrow(int x1, int y1, int x2, int y2,
-            int[] xpoints, int[] ypoints);
+	public final void drawArrow(int x1, int y1, int x2, int y2,
+			Chart.ArrowDirection direction) {
+		expandBounds(x1, y1);
+		expandBounds(x2, y2);
+		int[] xpoints = null;
+		int[] ypoints = null;
+		switch (direction) {
+		case RIGHT:
+			xpoints = new int[] { x2, x2 - arrowSize() * 2,
+					x2 - arrowSize() * 2 };
+			ypoints = new int[] { y2, y2 - arrowSize(), y2 + arrowSize() };
+			break;
+		case UP:
+			xpoints = new int[] { x2, x2 - arrowSize(), x2 + arrowSize() };
+			ypoints = new int[] { y2, y2 + arrowSize() * 2,
+					y2 + arrowSize() * 2 };
+			break;
+		case LEFT:
+			xpoints = new int[] { x2, x2 + arrowSize() * 2,
+					x2 + arrowSize() * 2 };
+			ypoints = new int[] { y2, y2 + arrowSize(), y2 - arrowSize() };
+			break;
+		case DOWN:
+			xpoints = new int[] { x2, x2 - arrowSize(), x2 + arrowSize() };
+			ypoints = new int[] { y2, y2 - arrowSize() * 2,
+					y2 - arrowSize() * 2 };
+			break;
+		}
+		internalDrawArrow(x1, y1, x2, y2, xpoints, ypoints);
+	}
 
-    public final void drawRectangle(int x, int y, int width, int height) {
-        expandBounds(x, y);
-        expandBounds(x + width, y + height);
-        internalDrawRectangle(x, y, width, height);
-    }
+	protected abstract void internalDrawArrow(int x1, int y1, int x2, int y2,
+			int[] xpoints, int[] ypoints);
 
-    protected abstract void internalDrawRectangle(int x, int y, int width,
-            int height);
+	public final void drawRectangle(int x, int y, int width, int height) {
+		expandBounds(x, y);
+		expandBounds(x + width, y + height);
+		internalDrawRectangle(x, y, width, height);
+	}
 
-    public final void drawLine(int x1, int y1, int x2, int y2) {
-        expandBounds(x1, y1);
-        expandBounds(x2, y2);
-        internalDrawLine(x1, y1, x2, y2);
-    }
+	protected abstract void internalDrawRectangle(int x, int y, int width,
+			int height);
 
-    protected abstract void internalDrawLine(int x1, int y1, int x2, int y2);
+	public final void drawLine(int x1, int y1, int x2, int y2) {
+		expandBounds(x1, y1);
+		expandBounds(x2, y2);
+		internalDrawLine(x1, y1, x2, y2);
+	}
 
-    public final void drawArcCorner(int x, int y, int startAngle) {
-        drawArc(x, y, arcSize(), arcSize(), startAngle, 90);
-    }
+	protected abstract void internalDrawLine(int x1, int y1, int x2, int y2);
 
-    public final void drawArcCorner(int x, int y, int arcSize, int startAngle) {
-        drawArc(x, y, arcSize, arcSize, startAngle, 90);
-    }
+	public final void drawArcCorner(int x, int y, int startAngle) {
+		drawArc(x, y, arcSize(), arcSize(), startAngle, 90);
+	}
 
-    protected abstract void internalDrawArc(int x, int y, int width,
-            int height,
-            int startAngle,
-            int arcAngle);
+	public final void drawArcCorner(int x, int y, int arcSize, int startAngle) {
+		drawArc(x, y, arcSize, arcSize, startAngle, 90);
+	}
 
-    protected void expandBounds(int x, int y) {
-    }
+	protected abstract void internalDrawArc(int x, int y, int width,
+			int height, int startAngle, int arcAngle);
 
-    public Dimension size(String symbolName) {
-        // could not found a better way of doing this
-        SizeChart sizeChart = new SizeChart(this);
-        sizeChart.prepare();
-        // just fake the drawing
-        sizeChart.draw(symbolName);
-        return new Dimension(sizeChart.width(), sizeChart.height());
-    }
+	protected void expandBounds(int x, int y) {
+	}
 
-    protected Symbol symbol(String name) {
-        Symbol symbol = grammar.symbolMap.get(name);
-        if (symbol == null) {
-            throw new IllegalArgumentException("Symbol not found: " + name);
-        }
-        return symbol;
-    }
+	public Dimension size(String symbolName) {
+		// could not found a better way of doing this
+		SizeChart sizeChart = new SizeChart(this);
+		sizeChart.prepare();
+		// just fake the drawing
+		sizeChart.draw(symbolName);
+		return new Dimension(sizeChart.width(), sizeChart.height());
+	}
 
-    public ChartOptions getOptions() {
-        return options;
-    }
+	protected Symbol symbol(String name) {
+		Symbol symbol = grammar.symbolMap.get(name);
+		if (symbol == null) {
+			throw new IllegalArgumentException("Symbol not found: " + name);
+		}
+		return symbol;
+	}
 
-    public void setOptions(ChartOptions options) {
-        this.options = options;
-    }
+	public ChartOptions getOptions() {
+		return options;
+	}
 
-    public int fontHeight() {
-        return getOptions().fontHeight();
-    }
+	public void setOptions(ChartOptions options) {
+		this.options = options;
+	}
 
-    public int initialX() {
-        return getOptions().initialX();
-    }
+	public int fontHeight() {
+		return getOptions().fontHeight();
+	}
 
-    public int initialY() {
-        return getOptions().initialY();
-    }
+	public int initialX() {
+		return getOptions().initialX();
+	}
 
-    public int stringWidth(String text) {
-        return getOptions().stringWidth(text);
-    }
+	public int initialY() {
+		return getOptions().initialY();
+	}
 
-    public int componentGapWidth() {
-        return getOptions().componentGapWidth();
-    }
+	public int stringWidth(String text) {
+		return getOptions().stringWidth(text);
+	}
 
-    public int componentGapHeight() {
-        return getOptions().componentGapHeight();
-    }
+	public int componentGapWidth() {
+		return getOptions().componentGapWidth();
+	}
 
-    public int arrowSize() {
-        return getOptions().arrowSize();
-    }
+	public int componentGapHeight() {
+		return getOptions().componentGapHeight();
+	}
 
-    public int arcSize() {
-        return getOptions().arcSize();
-    }
+	public int arrowSize() {
+		return getOptions().arrowSize();
+	}
 
-    public int symbolGapWidth() {
-        return getOptions().symbolGapWidth();
-    }
+	public int arcSize() {
+		return getOptions().arcSize();
+	}
 
-    public int symbolGapHeight() {
-        return getOptions().symbolGapHeight();
-    }
+	public int symbolGapWidth() {
+		return getOptions().symbolGapWidth();
+	}
 
-    public void withInitialLocation(int x, int y) {
-        getOptions().withInitialLocation(x, y);
-    }
+	public int symbolGapHeight() {
+		return getOptions().symbolGapHeight();
+	}
 
-    public boolean showBorders() {
-        return getOptions().showBorders();
-    }
+	public void withInitialLocation(int x, int y) {
+		getOptions().withInitialLocation(x, y);
+	}
 
-    public boolean optimize() {
-        return getOptions().optimize();
-    }
+	public boolean showBorders() {
+		return getOptions().showBorders();
+	}
 
-    public ChartOptions withArcSize(int size) {
-        getOptions().withArcSize(size);
-        return getOptions();
-    }
+	public boolean optimize() {
+		return getOptions().optimize();
+	}
 
-    public ChartOptions withComponentGapHeight(int height) {
-        getOptions().withComponentGapHeight(height);
-        return getOptions();
-    };
+	public ChartOptions withArcSize(int size) {
+		getOptions().withArcSize(size);
+		return getOptions();
+	}
 
-    public ChartOptions withOptimize(boolean optimize) {
-        getOptions().withOptimize(optimize);
-        return getOptions();
-    }
+	public ChartOptions withComponentGapHeight(int height) {
+		getOptions().withComponentGapHeight(height);
+		return getOptions();
+	};
 
-    public ChartOptions withIterationOrder(ChartLayout rightToLeft) {
-        getOptions().withIterationOrder(rightToLeft);
-        return getOptions();
-    }
-    
-    public ChartLayout iterationLayout() {
-        return getOptions().iterationLayout();
-    }
+	public ChartOptions withOptimize(boolean optimize) {
+		getOptions().withOptimize(optimize);
+		return getOptions();
+	}
+
+	public ChartOptions withIterationOrder(ChartLayout rightToLeft) {
+		getOptions().withIterationOrder(rightToLeft);
+		return getOptions();
+	}
+
+	public ChartLayout iterationLayout() {
+		return getOptions().iterationLayout();
+	}
+
+	public boolean showSymbolName() {
+		return getOptions().showSymbolName();
+	}
+
+	public ChartOptions withSymbolName(boolean show) {
+		return getOptions().withSymbolName(show);
+	}
 }

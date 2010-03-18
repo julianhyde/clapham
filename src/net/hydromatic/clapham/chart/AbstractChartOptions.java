@@ -57,6 +57,8 @@ public abstract class AbstractChartOptions implements ChartOptions {
 
     private ChartLayout iterationLayout;
 
+	private boolean showSymbolName;
+
     public AbstractChartOptions() {
         this.arcSize = ARC_SIZE;
         this.arrowSize = ARROW_SIZE;
@@ -69,6 +71,7 @@ public abstract class AbstractChartOptions implements ChartOptions {
         this.symbolGapHeight = SYMBOL_GAP_HEIGHT;
         this.symbolGapWidth = SYMBOL_GAP_WIDTH;
         this.iterationLayout = ChartLayout.BEST;
+        showSymbolName = false;
     }
 
     public boolean optimize() {
@@ -153,5 +156,14 @@ public abstract class AbstractChartOptions implements ChartOptions {
 
     public ChartLayout iterationLayout() {
         return iterationLayout;
+    }
+    
+    public boolean showSymbolName() {
+    	return showSymbolName;
+    }
+    
+    public ChartOptions withSymbolName(boolean show) {
+    	showSymbolName = show;
+    	return this;
     }
 }
