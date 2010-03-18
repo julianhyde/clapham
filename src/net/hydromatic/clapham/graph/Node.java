@@ -1356,18 +1356,18 @@ public class Node {
 		    - options.arcSize() / 2
 		    - options.componentGapHeight() / 2 + 1);
 		// the the long horizontal line between the quarter Arcs
-//		chart.drawLine(
-//		    p.x
-//		    + options.componentGapWidth() / 4
-//		    + options.arcSize(),
-//		    n.posEnd.y
-//		    - options.componentGapHeight() / 2,
-//		    p.x
-//		    - options.componentGapWidth() / 4
-//		    - options.arcSize()
-//		    + n.size.getWidth()
-//		    + 1,
-//		    n.posEnd.y - options.componentGapHeight() / 2);
+		chart.drawLine(
+		    p.x
+		    + options.componentGapWidth() / 4
+		    + options.arcSize(),
+		    n.posEnd.y
+		    - options.componentGapHeight() / 2,
+		    p.x
+		    - options.componentGapWidth() / 4
+		    - options.arcSize()
+		    + n.size.getWidth()
+		    + 1,
+		    n.posEnd.y - options.componentGapHeight() / 2);
 
 		n.sub.drawComponents(
 		    chart,
