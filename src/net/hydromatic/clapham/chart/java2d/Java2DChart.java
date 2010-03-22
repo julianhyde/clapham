@@ -152,6 +152,12 @@ public class Java2DChart extends AbstractChart {
     protected void internalDrawRectangle(int x, int y, int width, int height) {
         g.drawRect(x, y, width, height);
     }
+    
+    @Override
+    protected void internalDrawRoundRectangle(int x, int y, int width,
+            int height, int arcWidth, int arcHeight) {
+        g.drawRoundRect(x, y, width, height, arcWidth, arcHeight);   
+    }
 
     public int fontHeightCorrectness() {
         return symbolGapHeight() * 3;

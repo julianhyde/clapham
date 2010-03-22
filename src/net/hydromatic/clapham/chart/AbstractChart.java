@@ -74,6 +74,11 @@ public abstract class AbstractChart implements Chart, ChartOptions {
 		@Override
 		protected void internalDrawRectangle(int x, int y, int width, int height) {
 		}
+		
+		@Override
+		public void internalDrawRoundRectangle(int x, int y, int width,
+		        int height, int arcWidth, int arcHeight) {
+		}
 
 		@Override
 		protected void internalDrawString(NodeType nodeType, String text,
@@ -133,7 +138,7 @@ public abstract class AbstractChart implements Chart, ChartOptions {
 		}
 	}
 
-	public final void draw(String symbolName) {
+	public void draw(String symbolName) {
 		Symbol symbol = symbol(symbolName);
 
 		Point p = new Point(initialX(), initialY() - 30);
@@ -143,7 +148,7 @@ public abstract class AbstractChart implements Chart, ChartOptions {
 					- componentGapHeight() - symbolGapHeight());
 		}
 		
-		grammar.printNodes(System.out);
+//		grammar.printNodes(System.out);
 
 		internalDrawLine(initialX() - componentGapWidth() / 4 - arcSize() / 2,
 				symbol.graph.l.posLine.y, initialX(), symbol.graph.l.posLine.y);
@@ -210,8 +215,18 @@ public abstract class AbstractChart implements Chart, ChartOptions {
 		expandBounds(x + width, y + height);
 		internalDrawRectangle(x, y, width, height);
 	}
+	
+	public final void drawRoundRectangle(int x, int y, int width, int height,
+	        int arcWidth, int arcHeight) {
+	    expandBounds(x, y);
+        expandBounds(x + width, y + height);
+        internalDrawRoundRectangle(x, y, width, height, arcWidth, arcHeight);	    
+	}
 
-	protected abstract void internalDrawRectangle(int x, int y, int width,
+	protected abstract void internalDrawRoundRectangle(int x, int y, int width,
+            int height, int arcWidth, int arcHeight);
+
+    protected abstract void internalDrawRectangle(int x, int y, int width,
 			int height);
 
 	public final void drawLine(int x1, int y1, int x2, int y2) {

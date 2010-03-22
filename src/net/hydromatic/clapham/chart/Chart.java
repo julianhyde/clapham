@@ -97,6 +97,8 @@ public interface Chart {
 
 	void drawString(NodeType nodeType, String text, int x, int y);
 
+	void drawRoundRectangle(int x, int y, int width, int height, int arcWidth, int arcHeight);
+	
 	void drawRectangle(int x, int y, int width, int height);
 
 	void drawArcCorner(int x, int y, int arcSize, int angle);
